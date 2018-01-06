@@ -44,11 +44,13 @@ library
   other-modules:
 
   build-depends:
-      base >= 4.6 && < 4.12
+      base        >= 4.6 && < 4.12
+    , network-uri == 2.6.*
+    , QuickCheck  >= 2.9 && < 2.11
 
   other-extensions:
 
-test-suite network-arbitrary
+test-suite network-arbitrary-tests
   default-language: Haskell2010
   type:             exitcode-stdio-1.0
   main-is:          Spec.hs
@@ -67,8 +69,9 @@ test-suite network-arbitrary
       hspec-discover:hspec-discover == 2.4.*
 
   build-depends:
-      base       >= 4.6 && < 4.12
-    , hspec      == 2.4.*
-    , QuickCheck >= 2.9 && < 2.11
+      base        >= 4.6 && < 4.12
+    , hspec       == 2.4.*
+    , network-uri == 2.6.*
+    , QuickCheck  >= 2.9 && < 2.11
 
   other-extensions:
