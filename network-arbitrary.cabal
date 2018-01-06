@@ -39,7 +39,8 @@ library
       src
 
   exposed-modules:
-      Network.HTTP.Media.MediaType.Arbitrary
+      Network.Arbitrary
+    , Network.HTTP.Media.MediaType.Arbitrary
     , Network.HTTP.Types.Method.Arbitrary 
     , Network.URI.Arbitrary
 
@@ -54,6 +55,7 @@ library
     , QuickCheck  >= 2.9 && < 2.11
 
   other-extensions:
+      RecordWildCards
 
 test-suite network-arbitrary-tests
   default-language: Haskell2010
@@ -87,3 +89,4 @@ test-suite network-arbitrary-tests
     , test-invariant   == 0.4.*
 
   other-extensions:
+      RecordWildCards
