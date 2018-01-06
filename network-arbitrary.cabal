@@ -39,12 +39,15 @@ library
       src
 
   exposed-modules:
-      Network.URI.Arbitrary
+      Network.HTTP.Media.MediaType.Arbitrary
+    , Network.URI.Arbitrary
 
   other-modules:
 
   build-depends:
       base        >= 4.6 && < 4.12
+    , bytestring  == 0.10.*
+    , http-media  >= 0.6 && < 0.8
     , network-uri == 2.6.*
     , QuickCheck  >= 2.9 && < 2.11
 
@@ -63,15 +66,19 @@ test-suite network-arbitrary-tests
     , test
 
   other-modules:
-      Network.URI.ArbitrarySpec
+      Network.HTTP.Media.MediaType.ArbitrarySpec
+    , Network.URI.ArbitrarySpec
 
   build-tool-depends:
       hspec-discover:hspec-discover == 2.4.*
 
   build-depends:
-      base        >= 4.6 && < 4.12
-    , hspec       == 2.4.*
-    , network-uri == 2.6.*
-    , QuickCheck  >= 2.9 && < 2.11
+      base             >= 4.6 && < 4.12
+    , bytestring       == 0.10.*
+    , case-insensitive == 1.2.*
+    , hspec            == 2.4.*
+    , http-media       >= 0.6 && < 0.8
+    , network-uri      == 2.6.*
+    , QuickCheck       >= 2.9 && < 2.11
 
   other-extensions:
