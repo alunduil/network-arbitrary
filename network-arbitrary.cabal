@@ -40,6 +40,7 @@ library
 
   exposed-modules:
       Network.HTTP.Media.MediaType.Arbitrary
+    , Network.HTTP.Types.Method.Arbitrary 
     , Network.URI.Arbitrary
 
   other-modules:
@@ -48,6 +49,7 @@ library
       base        >= 4.6 && < 4.12
     , bytestring  == 0.10.*
     , http-media  >= 0.6 && < 0.8
+    , http-types  == 0.9.*
     , network-uri == 2.6.*
     , QuickCheck  >= 2.9 && < 2.11
 
@@ -67,6 +69,7 @@ test-suite network-arbitrary-tests
 
   other-modules:
       Network.HTTP.Media.MediaType.ArbitrarySpec
+    , Network.HTTP.Types.Method.ArbitrarySpec
     , Network.URI.ArbitrarySpec
 
   build-tool-depends:
@@ -78,7 +81,9 @@ test-suite network-arbitrary-tests
     , case-insensitive == 1.2.*
     , hspec            == 2.4.*
     , http-media       >= 0.6 && < 0.8
+    , http-types       == 0.9.*
     , network-uri      == 2.6.*
     , QuickCheck       >= 2.9 && < 2.11
+    , test-invariant   == 0.4.*
 
   other-extensions:
