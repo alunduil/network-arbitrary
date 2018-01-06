@@ -2,7 +2,7 @@ let
   config = {
     packageOverrides = pkgs: rec {
       haskellPackages = pkgs.haskellPackages.override {
-        overrides = haskellPacakgesNew: haskellPackagesOld: rec {
+        overrides = haskellPackagesNew: haskellPackagesOld: rec {
 
           network-arbitrary =
             haskellPackagesNew.callPackage ./default.nix { };
