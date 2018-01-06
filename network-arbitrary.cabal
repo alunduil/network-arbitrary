@@ -39,12 +39,14 @@ library
       src
 
   exposed-modules:
-      Network.URI.Arbitrary
+      Network.HTTP.Types.Method.Arbitrary 
+    , Network.URI.Arbitrary
 
   other-modules:
 
   build-depends:
       base        >= 4.6 && < 4.12
+    , http-types  == 0.9.*
     , network-uri == 2.6.*
     , QuickCheck  >= 2.9 && < 2.11
 
@@ -63,15 +65,18 @@ test-suite network-arbitrary-tests
     , test
 
   other-modules:
-      Network.URI.ArbitrarySpec
+      Network.HTTP.Types.Method.ArbitrarySpec
+    , Network.URI.ArbitrarySpec
 
   build-tool-depends:
       hspec-discover:hspec-discover == 2.4.*
 
   build-depends:
-      base        >= 4.6 && < 4.12
-    , hspec       == 2.4.*
-    , network-uri == 2.6.*
-    , QuickCheck  >= 2.9 && < 2.11
+      base           >= 4.6 && < 4.12
+    , hspec          == 2.4.*
+    , http-types     == 0.9.*
+    , network-uri    == 2.6.*
+    , QuickCheck     >= 2.9 && < 2.11
+    , test-invariant == 0.4.*
 
   other-extensions:
