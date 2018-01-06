@@ -1,7 +1,7 @@
 {-|
 Module      : Network.URI.ArbitrarySpec
 Description : Tests for Network.URI.Arbitrary
-Copyright   : (c) Alex Brandt, 2017
+Copyright   : (c) Alex Brandt, 2018
 License     : MIT
 
 Tests for "Network.URI.Arbitrary".

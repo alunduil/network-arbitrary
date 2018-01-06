@@ -5,7 +5,7 @@
 {-|
 Module      : Network.URI.Arbitrary
 Description : Arbitrary Instances for Network.URI
-Copyright   : (c) Alex Brandt, 2017
+Copyright   : (c) Alex Brandt, 2018
 License     : MIT
 
 Arbitrary instances for "Network.URI".
