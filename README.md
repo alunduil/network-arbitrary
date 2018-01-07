@@ -25,7 +25,7 @@ attribution; please, add yourself to the `COPYRIGHT` file.
 
 [Arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
 [git flow]: http://nvie.com/posts/a-successful-git-branching-model/
-[Hackage]: https://hackage.haskell.org/package/network-uri-json
+[Hackage]: https://hackage.haskell.org/package/network-arbitrary
 [Haskell]: https://www.haskell.org/
 [issues]: https://github.com/alunduil/network-arbitrary/issues
 [network-category]: https://hackage.haskell.org/packages/#cat:Network
