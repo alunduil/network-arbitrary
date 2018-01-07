@@ -15,7 +15,7 @@ module Network.URI.Arbitrary () where
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad (replicateM)
 import Data.List (intercalate)
-import Network.URI (URI (..), URIAuth (..))
+import Network.URI (parseURIReference, URI (..), URIAuth (..), uriToString)
 import Test.QuickCheck (Arbitrary (arbitrary, shrink), choose, elements, Gen, listOf, listOf1, oneof, suchThat)
 
 instance Arbitrary URI where
@@ -29,7 +29,11 @@ instance Arbitrary URI where
        return URI {..}
     where emptyAuthority URIAuth{..} = all null [uriUserInfo, uriRegName, uriPort]
 
-  shrink URI{..} = [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment' | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <- shrink (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment) ]
+  shrink URI{..} = filter isURI [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment' | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <- shrink (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment) ]
+    where isURI u = case parseURIReference (uriToString id u "") of
+                      Just u' -> u' == u
+                      Nothing -> False
+
 
 instance Arbitrary URIAuth where
   arbitrary = URIAuth <$> userinfo
