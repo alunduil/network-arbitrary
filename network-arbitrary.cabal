@@ -14,7 +14,7 @@ maintainer:          alunduil@alunduil.com
 copyright:           (c) 2018 Alex Brandt
 category:            Testing
 build-type:          Simple
-cabal-version:       >=1.10
+cabal-version:       >= 1.10
 tested-with:         GHC >= 7.6 && < 9.0
 
 extra-source-files:
