@@ -70,8 +70,11 @@ test-suite network-arbitrary-tests
     , test
 
   other-modules:
-      Network.HTTP.Media.MediaType.ArbitrarySpec
+      Network.HTTP.Media.MediaType.Arbitrary
+    , Network.HTTP.Media.MediaType.ArbitrarySpec
+    , Network.HTTP.Types.Method.Arbitrary 
     , Network.HTTP.Types.Method.ArbitrarySpec
+    , Network.URI.Arbitrary
     , Network.URI.ArbitrarySpec
 
   build-tool-depends:
