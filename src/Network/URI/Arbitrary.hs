@@ -134,7 +134,7 @@ path emptyScheme emptyURIAuth = if emptyURIAuth
                                    else pathAbEmpty
 
 pathAbEmpty :: Gen String
-pathAbEmpty = concat <$> listOf ((('/':) . concat) <$> listOf pchar)
+pathAbEmpty = concat <$> listOf (('/':) . concat <$> listOf pchar)
 
 pathAbsolute :: Gen String
 pathAbsolute = ('/':) <$> oneof [return "", pathRootless]
