@@ -52,7 +52,7 @@ library
     , http-media  >= 0.6 && < 0.8
     , http-types  == 0.9.*
     , network-uri == 2.6.*
-    , QuickCheck  >= 2.9 && < 2.11
+    , QuickCheck  >= 2.9 && < 2.13
 
   other-extensions:
       RecordWildCards
@@ -88,7 +88,7 @@ test-suite network-arbitrary-tests
     , http-media       >= 0.6 && < 0.8
     , http-types       == 0.9.*
     , network-uri      == 2.6.*
-    , QuickCheck       >= 2.9 && < 2.11
+    , QuickCheck       >= 2.9 && < 2.13
     , test-invariant   == 0.4.*
 
   other-extensions:
