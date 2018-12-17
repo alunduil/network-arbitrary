@@ -10,7 +10,7 @@ bug-reports:         https://github.com/alunduil/network-arbitrary/issues
 license:             MIT
 license-file:        LICENSE
 author:              Alex Brandt
-maintainer:          alunduil@alunduil.com
+maintainer:          alunduil@gmail.com
 copyright:           (c) 2018 Alex Brandt
 category:            Testing
 build-type:          Simple
