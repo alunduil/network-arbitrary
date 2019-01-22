@@ -78,13 +78,13 @@ test-suite network-arbitrary-tests
     , Network.URI.ArbitrarySpec
 
   build-tool-depends:
-      hspec-discover:hspec-discover >= 2.4 && < 2.7
+      hspec-discover:hspec-discover >= 2.4 && < 2.8
 
   build-depends:
       base             >= 4.6 && < 4.13
     , bytestring       == 0.10.*
     , case-insensitive == 1.2.*
-    , hspec            >= 2.4 && < 2.7
+    , hspec            >= 2.4 && < 2.8
     , http-media       >= 0.6 && < 0.8
     , http-types       >= 0.9 && < 0.13
     , network-uri      == 2.6.*
