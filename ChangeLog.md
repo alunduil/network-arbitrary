@@ -1,5 +1,9 @@
 # Revision history for network-arbitrary
 
+## 0.4.0.3  -- 2019-01-31
+
+* Change cloudbuild to use new-sdist.
+
 ## 0.4.0.2  -- 2018-01-29
 
 * Update hspec and hspec-discover.
