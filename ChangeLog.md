@@ -1,5 +1,9 @@
 # Revision history for network-arbitrary
 
+## 0.4.0.4  -- 2019-02-06
+
+* Use new dist path in cloudbuild.
+
 ## 0.4.0.3  -- 2019-01-31
 
 * Change cloudbuild to use new-sdist.
