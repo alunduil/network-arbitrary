@@ -1,5 +1,9 @@
 # Revision history for network-arbitrary
 
+## 0.4.0.7  -- 2019-02-14
+
+* Use a volume to carry configuration information forward.
+
 ## 0.4.0.6  -- 2019-02-12
 
 * Include encrypted cabal configuration.
