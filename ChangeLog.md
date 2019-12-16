@@ -1,5 +1,9 @@
 # Revision history for network-arbitrary
 
+## 0.5.0.0  -- 2019-12-13
+
+* Bump upper bounds of dependencies.
+
 ## 0.4.0.7  -- 2019-02-14
 
 * Use a volume to carry configuration information forward.
