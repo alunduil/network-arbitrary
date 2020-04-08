@@ -12,7 +12,7 @@ Arbitrary instances for "Network.URI".
 -}
 module Network.URI.Arbitrary () where
 
-import Control.Applicative ((<$>), (<*>))
+import Control.Applicative ()
 import Control.Monad (replicateM)
 import Data.List (intercalate)
 import Network.URI (parseURIReference, URI (..), URIAuth (..), uriToString)

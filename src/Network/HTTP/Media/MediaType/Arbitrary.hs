@@ -12,11 +12,11 @@ module Network.HTTP.Media.MediaType.Arbitrary () where
 
 import Prelude hiding (concat)
 
-import Control.Applicative ((<*>))
+import Control.Applicative ()
 import Control.Monad (replicateM)
 import Data.ByteString (append, concat, ByteString)
 import Data.ByteString.Char8 (singleton)
-import Data.Functor ((<$>))
+import Data.Functor ()
 import Network.HTTP.Media.MediaType ((/:), (//), MediaType)
 import Test.QuickCheck (Arbitrary (arbitrary), choose, elements, Gen, listOf, oneof, sized)
 
