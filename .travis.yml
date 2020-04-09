@@ -87,7 +87,7 @@ matrix:
     - compiler: "ghc-8.6.1"
 
 before_install:
-  - HC=${CC}/ghc
+  - HC=${CC}
   - HCPKG=${HC/ghc/ghc-pkg}
   - unset CC
   - ROOTDIR=$(pwd)
@@ -98,7 +98,7 @@ before_install:
 
 install:
   - cabal --version
-  - echo "$(${HC} --version) [$(${HC} --print-project-git-commit-id 2> /dev/null || echo '?')]"
+  - echo "$(${HC}/ghc --version) [$(${HC} --print-project-git-commit-id 2> /dev/null || echo '?')]"
   - BENCH=${BENCH---enable-benchmarks}
   - TEST=${TEST---enable-tests}
   - HADDOCK=${HADDOCK-true}
