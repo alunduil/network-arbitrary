@@ -44,12 +44,12 @@ matrix:
 before_install:
   - HC=${CC}
   - echo ${HC}
-  - ls -al ${HC}
   - HCPKG=${HC/ghc/ghc-pkg}
   - unset CC
   - ROOTDIR=$(pwd)
   - mkdir -p $HOME/.local/bin
   - "PATH=/opt/ghc/bin:/opt/ghc-ppa-tools/bin:$HOME/local/bin:$PATH"
+  - ls -al
   - HCNUMVER=$(( $(${HC} --numeric-version|sed -E 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\1 * 10000 + \2 * 100 + \3/') ))
   - echo ghc version is $HCNUMVER
   - eoch $(${HC}\ghc --version)
