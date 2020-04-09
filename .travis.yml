@@ -147,7 +147,10 @@ script:
   # test that source-distributions can be generated
   - (cd "." && cabal sdist)
   - mv "."/dist/network-arbitrary-*.tar.gz ${DISTDIR}/
+  - ls -al ./dist
   - cd ${DISTDIR} || false
+  - pwd
+  - ls -al
   - find . -maxdepth 1 -name '*.tar.gz' -exec tar -xvf '{}' \;
   - "printf 'packages: network-arbitrary-*/*.cabal\\n' > cabal.project"
   - touch cabal.project.local
