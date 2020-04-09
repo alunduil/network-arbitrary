@@ -87,7 +87,7 @@ matrix:
     - compiler: "ghc-8.6.1"
 
 before_install:
-  - HC=${CC}
+  - HC=${CC}/ghc
   - HCPKG=${HC/ghc/ghc-pkg}
   - unset CC
   - ROOTDIR=$(pwd)
