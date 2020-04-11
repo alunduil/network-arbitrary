@@ -8,19 +8,15 @@ License     : MIT
 
 Arbitrary instances for "Network.HTTP.Types.Method".
 -}
-module Network.HTTP.Types.Method.Arbitrary () where
+module Network.HTTP.Types.Method.Arbitrary
+  ()
+where
 
-import Network.HTTP.Types.Method (StdMethod (..))
-import Test.QuickCheck (Arbitrary (arbitrary), elements)
+import           Network.HTTP.Types.Method      ( StdMethod(..) )
+import           Test.QuickCheck                ( Arbitrary(arbitrary)
+                                                , elements
+                                                )
 
 instance Arbitrary StdMethod where
-  arbitrary = elements [ GET
-                       , POST
-                       , HEAD
-                       , PUT
-                       , DELETE
-                       , TRACE
-                       , CONNECT
-                       , OPTIONS
-                       , PATCH
-                       ]
+  arbitrary =
+    elements [GET, POST, HEAD, PUT, DELETE, TRACE, CONNECT, OPTIONS, PATCH]
