@@ -1,20 +1,27 @@
 name:                network-arbitrary
 version:             0.5.0.0
-synopsis:            Arbitrary Instances for Network Types
 
-description:         
-  Arbitrary instances for Network types.
+license:             MIT
+license-file:        LICENSE
+
+copyright:           (c) 2018 Alex Brandt
+
+author:              Alex Brandt
+maintainer:          alunduil@gmail.com
+
+stability:           stable
 
 homepage:            https://github.com/alunduil/network-arbitrary
 bug-reports:         https://github.com/alunduil/network-arbitrary/issues
-license:             MIT
-license-file:        LICENSE
-author:              Alex Brandt
-maintainer:          alunduil@gmail.com
-copyright:           (c) 2018 Alex Brandt
+
+synopsis:            Arbitrary Instances for Network Types
+description:
+  Arbitrary instances for Network types.
+
 category:            Testing
-build-type:          Simple
+
 cabal-version:       >= 1.10
+build-type:          Simple
 tested-with:         GHC >= 7.6 && < 8.2.1 || > 8.2.1 && < 9.0
 
 extra-source-files:
@@ -24,72 +31,85 @@ extra-source-files:
   , README.md
   , Setup.hs
 
-source-repository head
-  type:     git
-  location: https://github.com/alunduil/network-arbitrary
-  branch:   develop
-
 library
+  ghc-options:
+    -Wall
+  if impl(ghc >= 8) {
+  ghc-options:
+    -Wcompat
+  } else {
+  ghc-options:
+    -fwarn-monomorphism-restriction
+    -fwarn-tabs
+    -fwarn-unused-do-bind
+  }
+
   default-language:    Haskell2010
 
-  ghc-options: -Wall -fwarn-tabs -fwarn-monomorphism-restriction
-               -fwarn-unused-do-bind
-
-  hs-source-dirs:
-      src
+  build-depends:
+      base >= 4.6 && < 4.14
+    , bytestring == 0.10.*
+    , http-media >= 0.6 && < 0.9
+    , http-types >= 0.9 && < 0.13
+    , network-uri == 2.6.*
+    , QuickCheck >= 2.9 && < 2.14
 
   exposed-modules:
       Network.Arbitrary
     , Network.HTTP.Media.MediaType.Arbitrary
-    , Network.HTTP.Types.Method.Arbitrary 
+    , Network.HTTP.Types.Method.Arbitrary
     , Network.URI.Arbitrary
 
   other-modules:
 
-  build-depends:
-      base        >= 4.6 && < 4.14
-    , bytestring  == 0.10.*
-    , http-media  >= 0.6 && < 0.9
-    , http-types  >= 0.9 && < 0.13
-    , network-uri == 2.6.*
-    , QuickCheck  >= 2.9 && < 2.14
-
-  other-extensions:
-      RecordWildCards
+  hs-source-dirs:
+      src
 
 test-suite network-arbitrary-tests
-  default-language: Haskell2010
   type:             exitcode-stdio-1.0
   main-is:          Spec.hs
 
-  ghc-options: -Wall -fwarn-tabs -fwarn-monomorphism-restriction
-               -fwarn-unused-do-bind
+  ghc-options:
+    -Wall
+  if impl(ghc >= 8) {
+  ghc-options:
+    -Wcompat
+  } else {
+  ghc-options:
+    -fwarn-monomorphism-restriction
+    -fwarn-tabs
+    -fwarn-unused-do-bind
+  }
+
+  default-language: Haskell2010
+
+  build-depends:
+      base >= 4.6 && < 4.14
+    , bytestring == 0.10.*
+    , case-insensitive == 1.2.*
+    , hspec >= 2.4 && < 2.8
+    , http-media >= 0.6 && < 0.9
+    , http-types >= 0.9 && < 0.13
+    , network-uri == 2.6.*
+    , QuickCheck >= 2.9 && < 2.14
+    , test-invariant == 0.4.*
+
+  build-tool-depends:
+      hspec-discover:hspec-discover >= 2.4 && < 2.8
+
+  other-modules:
+      Network.HTTP.Media.MediaType.Arbitrary
+    , Network.HTTP.Media.MediaType.ArbitrarySpec
+    , Network.HTTP.Types.Method.Arbitrary
+    , Network.HTTP.Types.Method.ArbitrarySpec
+    , Network.URI.Arbitrary
+    , Network.URI.ArbitrarySpec
 
   hs-source-dirs:
       src
     , test
 
-  other-modules:
-      Network.HTTP.Media.MediaType.Arbitrary
-    , Network.HTTP.Media.MediaType.ArbitrarySpec
-    , Network.HTTP.Types.Method.Arbitrary 
-    , Network.HTTP.Types.Method.ArbitrarySpec
-    , Network.URI.Arbitrary
-    , Network.URI.ArbitrarySpec
-
-  build-tool-depends:
-      hspec-discover:hspec-discover >= 2.4 && < 2.8
-
-  build-depends:
-      base             >= 4.6 && < 4.14
-    , bytestring       == 0.10.*
-    , case-insensitive == 1.2.*
-    , hspec            >= 2.4 && < 2.8
-    , http-media       >= 0.6 && < 0.9
-    , http-types       >= 0.9 && < 0.13
-    , network-uri      == 2.6.*
-    , QuickCheck       >= 2.9 && < 2.14
-    , test-invariant   == 0.4.*
-
-  other-extensions:
-      RecordWildCards
+source-repository head
+  type:     git
+  location: https://github.com/alunduil/network-arbitrary
+  branch:   develop
