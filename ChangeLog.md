@@ -1,5 +1,11 @@
 # Revision history for network-arbitrary
 
+## 0.6.0.0  -- 2020-04-11
+
+* Update project structure.
+* Migration to ghc 8.8
+* Update travis.yml with haskell-ci
+
 ## 0.5.0.0  -- 2019-12-13
 
 * Bump upper bounds of dependencies.
