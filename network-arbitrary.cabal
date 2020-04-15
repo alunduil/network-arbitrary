@@ -51,8 +51,8 @@ library
     , bytestring == 0.10.*
     , http-media >= 0.6 && < 0.9
     , http-types >= 0.9 && < 0.13
-    , network-uri == 2.6.*
-    , QuickCheck >= 2.9 && < 2.14
+    , network-uri >= 2.6 && < 2.8
+    , QuickCheck >= 2.9 && < 2.15
 
   exposed-modules:
       Network.Arbitrary
@@ -90,8 +90,8 @@ test-suite network-arbitrary-tests
     , hspec >= 2.4 && < 2.8
     , http-media >= 0.6 && < 0.9
     , http-types >= 0.9 && < 0.13
-    , network-uri == 2.6.*
-    , QuickCheck >= 2.9 && < 2.14
+    , network-uri >= 2.6 && < 2.8
+    , QuickCheck >= 2.9 && < 2.15
     , test-invariant == 0.4.*
 
   build-tool-depends:
