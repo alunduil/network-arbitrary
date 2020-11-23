@@ -36,7 +36,7 @@ import           Test.QuickCheck                ( Arbitrary(arbitrary, shrink)
 
 instance Arbitrary URI where
   arbitrary = do
-    uriScheme    <- scheme
+    uriScheme    <- oneof [return "", scheme]
     uriAuthority <- arbitrary :: Gen (Maybe URIAuth)
     uriPath <- path (null uriScheme) $ maybe True emptyAuthority uriAuthority
     uriQuery     <- oneof [query, return ""]
