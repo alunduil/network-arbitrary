@@ -1,7 +1,9 @@
-.direnv/
+# Created by https://www.toptal.com/developers/gitignore/api/haskell,direnv
+# Edit at https://www.toptal.com/developers/gitignore?templates=haskell,direnv
 
-# Created by https://www.gitignore.io/api/haskell
-# Edit at https://www.gitignore.io/?templates=haskell
+### direnv ###
+.direnv
+.envrc
 
 ### Haskell ###
 dist
@@ -9,6 +11,7 @@ dist-*
 cabal-dev
 *.o
 *.hi
+*.hie
 *.chi
 *.chs.h
 *.dyn_o
@@ -27,4 +30,4 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 
-# End of https://www.gitignore.io/api/haskell
+# End of https://www.toptal.com/developers/gitignore/api/haskell,direnv

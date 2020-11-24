@@ -1,6 +1,6 @@
 # Description
 
-[Arbitrary] Instances for [Network][network-category] Types
+[Arbitrary][arbitrary] Instances for [Network][network-category] Types
 
 I am providing code in the repository to you under an open source license.
 Because this is my personal repository, the license you receive to my code is
@@ -8,7 +8,7 @@ from me and not my employer (Facebook).
 
 # Getting Started
 
-Documentation is available on [Hackage].  A great guide to [QuickCheck] is
+Documentation is available on [Hackage][hackage].  A great guide to [QuickCheck][quickcheck] is
 <https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html>.
 
 # Reporting Issues
@@ -18,7 +18,7 @@ you've found an error or have a suggestion for a new feature; please, ensure
 that it is reported.
 
 If you would like to contribute a fix or new feature; please, submit a pull
-request.  This project follows [git flow] and utilizes [travis] to automatically
+request.  This project follows [git flow][git flow] and utilizes [travis][travis] to automatically
 check pull requests before a manual review.
 
 # Contributors
@@ -27,11 +27,10 @@ The `COPYRIGHT` file contains a list of contributors with their respective
 copyrights and other information.  If you submit a pull request and would like
 attribution; please, add yourself to the `COPYRIGHT` file.
 
-[Arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
+[arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
 [git flow]: http://nvie.com/posts/a-successful-git-branching-model/
-[Hackage]: https://hackage.haskell.org/package/network-arbitrary
-[Haskell]: https://www.haskell.org/
+[hackage]: https://hackage.haskell.org/package/network-arbitrary
 [issues]: https://github.com/alunduil/network-arbitrary/issues
 [network-category]: https://hackage.haskell.org/packages/#cat:Network
-[QuickCheck]: https://hackage.haskell.org/package/QuickCheck
+[quickcheck]: https://hackage.haskell.org/package/QuickCheck
 [travis]: https://travis-ci.org/alunduil/network-arbitrary
