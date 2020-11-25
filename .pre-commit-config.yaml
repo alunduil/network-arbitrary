@@ -54,6 +54,7 @@ repos:
           - id: mdformat
             additional_dependencies:
                 - mdformat-tables
+                - attr
     - repo: local
       hooks:
           - id: hlint
@@ -76,7 +77,7 @@ repos:
           - id: haskell-ci
             name: haskell-ci
             entry: haskell-ci
-            args: [--output, .travis.yml, --ghc-head, --hlint]
+            args: [--output, .travis.yml, --ghc-head, --hlint, --last-in-series]
             language: system
             types: [file]
             files: \.cabal$
