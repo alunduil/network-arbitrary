@@ -12,21 +12,30 @@ module Network.HTTP.Media.MediaType.ArbitrarySpec
   )
 where
 
-import           Prelude                 hiding ( null )
+import Prelude hiding
+  ( null
+  )
 
-import           Data.ByteString                ( null )
-import           Data.CaseInsensitive           ( original )
-import           Network.HTTP.Media.MediaType   ( mainType
-                                                , subType
-                                                )
-import           Test.Hspec                     ( describe
-                                                , hspec
-                                                , Spec
-                                                )
-import           Test.Hspec.QuickCheck          ( prop )
+import Data.ByteString
+  ( null
+  )
+import Data.CaseInsensitive
+  ( original
+  )
+import Network.HTTP.Media.MediaType
+  ( mainType
+  , subType
+  )
+import Test.Hspec
+  ( Spec
+  , describe
+  , hspec
+  )
+import Test.Hspec.QuickCheck
+  ( prop
+  )
 
-import           Network.HTTP.Media.MediaType.Arbitrary
-                                                ( )
+import Network.HTTP.Media.MediaType.Arbitrary ()
 
 main :: IO ()
 main = hspec spec

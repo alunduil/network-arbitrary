@@ -14,29 +14,36 @@ module Network.URI.Arbitrary
   ()
 where
 
-import           Control.Applicative            ( (<$>)
-                                                , (<*>)
-                                                )
-import           Control.Monad                  ( replicateM )
-import           Data.List                      ( intercalate )
-import           Network.URI                    ( parseURIReference
-                                                , URI(..)
-                                                , URIAuth(..)
-                                                , uriToString
-                                                )
-import           Test.QuickCheck                ( Arbitrary(arbitrary, shrink)
-                                                , choose
-                                                , elements
-                                                , Gen
-                                                , listOf
-                                                , listOf1
-                                                , oneof
-                                                , suchThat
-                                                )
+import Control.Applicative
+  ( (<$>)
+  , (<*>)
+  )
+import Control.Monad
+  ( replicateM
+  )
+import Data.List
+  ( intercalate
+  )
+import Network.URI
+  ( URI (..)
+  , URIAuth (..)
+  , parseURIReference
+  , uriToString
+  )
+import Test.QuickCheck
+  ( Arbitrary (arbitrary, shrink)
+  , Gen
+  , choose
+  , elements
+  , listOf
+  , listOf1
+  , oneof
+  , suchThat
+  )
 
 instance Arbitrary URI where
   arbitrary = do
-    uriScheme    <- scheme
+    uriScheme    <- oneof [return "", scheme]
     uriAuthority <- arbitrary :: Gen (Maybe URIAuth)
     uriPath <- path (null uriScheme) $ maybe True emptyAuthority uriAuthority
     uriQuery     <- oneof [query, return ""]
@@ -69,9 +76,9 @@ instance Arbitrary URIAuth where
 
 -- * RFC 3986 Generators
 --
---   Some generators are handled by the 'Arbitrary' instances above, and others
---   are folded into symbols that are preceeded or followed by identifying
---   tokens.
+--   Some generators are handled by the 'Arbitrary' instances above, and
+--   others are folded into symbols that are preceded or followed by
+--   identifying tokens.
 
 scheme :: Gen String
 scheme = do

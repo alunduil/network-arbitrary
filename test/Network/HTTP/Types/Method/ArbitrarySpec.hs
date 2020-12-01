@@ -12,18 +12,23 @@ module Network.HTTP.Types.Method.ArbitrarySpec
   )
 where
 
-import           Network.HTTP.Types.Method      ( parseMethod
-                                                , renderStdMethod
-                                                )
-import           Test.Hspec                     ( describe
-                                                , hspec
-                                                , Spec
-                                                )
-import           Test.Hspec.QuickCheck          ( prop )
-import           Test.Invariant                 ( (<=>) )
+import Network.HTTP.Types.Method
+  ( parseMethod
+  , renderStdMethod
+  )
+import Test.Hspec
+  ( Spec
+  , describe
+  , hspec
+  )
+import Test.Hspec.QuickCheck
+  ( prop
+  )
+import Test.Invariant
+  ( (<=>)
+  )
 
-import           Network.HTTP.Types.Method.Arbitrary
-                                                ( )
+import Network.HTTP.Types.Method.Arbitrary ()
 
 main :: IO ()
 main = hspec spec

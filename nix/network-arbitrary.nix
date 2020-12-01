@@ -4,8 +4,8 @@
 }:
 mkDerivation {
   pname = "network-arbitrary";
-  version = "0.6.0.0";
-  src = ./.;
+  version = "0.7.0.0";
+  src = ./..;
   libraryHaskellDepends = [
     base bytestring http-media http-types network-uri QuickCheck
   ];

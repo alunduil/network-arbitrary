@@ -1,1 +1,1 @@
-(import ./network-arbitrary.nix).network-arbitrary.env
+nix/shell.nix

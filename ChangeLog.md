@@ -1,5 +1,15 @@
 # Revision history for network-arbitrary
 
+## 0.7.0.0  -- 2020-11-30
+
+* Update project structure
+  * stylish-haskell configuration
+  * updated travis configuration
+  * pre-commit
+  * nix-shell with mkShell
+* Bump base dependence version
+* Generate relative references as well
+
 ## 0.6.0.0  -- 2020-04-11
 
 * Update project structure.
