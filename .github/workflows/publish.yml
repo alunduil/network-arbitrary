@@ -1,0 +1,19 @@
+name: Publish to Hackage
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: haskell-actions/setup@v2
+      - name: cabal sdist
+        run: cabal sdist
+      - name: cabal upload
+        run: cabal upload --publish --username=${{ secrets.HACKAGE_USERNAME }} --password=${{ secrets.HACKAGE_PASSWORD }} dist-newstyle/sdist/*.tar.gz

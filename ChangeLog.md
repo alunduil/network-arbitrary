@@ -1,5 +1,30 @@
 # Revision history for network-arbitrary
 
+## unreleased
+
+## 1.0.0.0  -- 2024-04-24
+
+### Added
+
+* GHC testing for 9.2.*, 9.4.*, 9.6.*, 9.8.*
+* Support for base 4.15, 4.16, 4.17, 4.18, and 4.19
+* Support for bytestring 0.11.1.0 and newer, and 0.12.1.0 and newer
+* Support for QuickCheck 2.15
+
+### Changed
+
+### Deprecated
+
+* GHC testing for older than 9.4
+
+### Fixed
+
+### Removed
+
+* GHC testing for <8.6.4
+
+### Security
+
 ## 0.7.0.0  -- 2020-11-30
 
 * Update project structure
