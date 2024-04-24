@@ -15,6 +15,8 @@
 
 ### Deprecated
 
+* GHC testing for older than 9.4
+
 ### Fixed
 
 ### Removed
