@@ -1,115 +1,72 @@
-name:                network-arbitrary
-version:             0.7.0.0
-
-license:             MIT
-license-file:        LICENSE
-
-copyright:           (c) 2018 Alex Brandt
-
-author:              Alex Brandt
-maintainer:          alunduil@gmail.com
-
-stability:           stable
-
-homepage:            https://github.com/alunduil/network-arbitrary
-bug-reports:         https://github.com/alunduil/network-arbitrary/issues
-
-synopsis:            Arbitrary Instances for Network Types
+cabal-version:      3.0
+name:               network-arbitrary
+version:            0.7.0.0
+license:            MIT
+license-file:       LICENSE
+copyright:          (c) 2018 Alex Brandt
+author:             Alex Brandt
+maintainer:         alunduil@gmail.com
+stability:          stable
+homepage:           https://github.com/alunduil/network-arbitrary
+bug-reports:        https://github.com/alunduil/network-arbitrary/issues
+synopsis:           Arbitrary Instances for Network Types
 description:
-  Arbitrary instances for Network types.
+  You can use network-arbitrary to provide Arbitrary instances for Network
+  module types.
 
-category:            Testing
-
-cabal-version:       >= 1.10
-build-type:          Simple
-tested-with:         GHC >= 7.6 && < 8.2.1 || > 8.2.1 && < 9.0
+category:           Testing
+tested-with:
+  GHC ==8.6.4 || ==8.6.5 || ==8.8.2 || ==8.8.3 || ==8.8.4 || ==8.10.1 || ==8.10.2 || ==8.10.3 || ==8.10.4 || ==8.10.5 || ==8.10.6 || ==8.10.7 || ==9.0.1 || ==9.0.2 || >=9.2 && <9.3 || >=9.4 && <9.5 || >=9.6 && <9.7 || >=9.8 && <9.9
 
 extra-source-files:
-    ChangeLog.md
-  , COPYRIGHT
-  , LICENSE
-  , README.md
-  , Setup.hs
-
-library
-  ghc-options:
-    -Wall
-  if impl(ghc >= 8) {
-  ghc-options:
-    -Wcompat
-  } else {
-  ghc-options:
-    -fwarn-monomorphism-restriction
-    -fwarn-tabs
-    -fwarn-unused-do-bind
-  }
-
-  default-language:    Haskell2010
-
-  build-depends:
-      base >= 4.6 && < 4.15
-    , bytestring == 0.10.*
-    , http-media >= 0.6 && < 0.9
-    , http-types >= 0.9 && < 0.13
-    , network-uri >= 2.6 && < 2.8
-    , QuickCheck >= 2.9 && < 2.15
-
-  exposed-modules:
-      Network.Arbitrary
-    , Network.HTTP.Media.MediaType.Arbitrary
-    , Network.HTTP.Types.Method.Arbitrary
-    , Network.URI.Arbitrary
-
-  other-modules:
-
-  hs-source-dirs:
-      src
-
-test-suite network-arbitrary-tests
-  type:             exitcode-stdio-1.0
-  main-is:          Spec.hs
-
-  ghc-options:
-    -Wall
-  if impl(ghc >= 8) {
-  ghc-options:
-    -Wcompat
-  } else {
-  ghc-options:
-    -fwarn-monomorphism-restriction
-    -fwarn-tabs
-    -fwarn-unused-do-bind
-  }
-
-  default-language: Haskell2010
-
-  build-depends:
-      base >= 4.6 && < 4.15
-    , bytestring == 0.10.*
-    , case-insensitive == 1.2.*
-    , hspec >= 2.4 && < 2.8
-    , http-media >= 0.6 && < 0.9
-    , http-types >= 0.9 && < 0.13
-    , network-uri >= 2.6 && < 2.8
-    , QuickCheck >= 2.9 && < 2.15
-    , test-invariant == 0.4.*
-
-  build-tool-depends:
-      hspec-discover:hspec-discover >= 2.4 && < 2.8
-
-  other-modules:
-      Network.HTTP.Media.MediaType.Arbitrary
-    , Network.HTTP.Media.MediaType.ArbitrarySpec
-    , Network.HTTP.Types.Method.Arbitrary
-    , Network.HTTP.Types.Method.ArbitrarySpec
-    , Network.URI.Arbitrary
-    , Network.URI.ArbitrarySpec
-
-  hs-source-dirs:
-      src
-    , test
+  ChangeLog.md
+  README.md
 
 source-repository head
   type:     git
   location: https://github.com/alunduil/network-arbitrary
-  branch:   develop
+
+common network-arbitrary-common
+  build-depends:
+    , base         >=4.6  && <4.15 || ^>=4.15.0.0 || ^>=4.16.0.0 || ^>=4.17.0.0 || ^>=4.18.0.0 || ^>=4.19.1.0
+    , bytestring   >=0.10 && <0.11 || ^>=0.11.1.0 || ^>=0.12.1.0
+    , http-media   >=0.6  && <0.9
+    , http-types   >=0.9  && <0.13
+    , network-uri  >=2.6  && <2.8
+    , QuickCheck   >=2.9  && <2.15
+
+library
+  import:           network-arbitrary-common
+  exposed-modules:
+    Network.Arbitrary
+    Network.HTTP.Media.MediaType.Arbitrary
+    Network.HTTP.Types.Method.Arbitrary
+    Network.URI.Arbitrary
+
+  other-modules:
+  build-depends:
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:      -Wall -Wcompat
+
+test-suite test
+  import:             network-arbitrary-common
+  type:               exitcode-stdio-1.0
+  main-is:            Spec.hs
+  build-depends:
+    , case-insensitive  >=1.2 && <1.3
+    , hspec             >=2.4 && <2.8 || ^>=2.11.8
+    , test-invariant    >=0.4 && <0.5
+
+  build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8
+  other-modules:
+    Network.HTTP.Media.MediaType.Arbitrary
+    Network.HTTP.Media.MediaType.ArbitrarySpec
+    Network.HTTP.Types.Method.Arbitrary
+    Network.HTTP.Types.Method.ArbitrarySpec
+    Network.URI.Arbitrary
+    Network.URI.ArbitrarySpec
+
+  hs-source-dirs:     src test
+  default-language:   Haskell2010
+  ghc-options:        -Wall -Wcompat
