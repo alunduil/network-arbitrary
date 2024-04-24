@@ -33,7 +33,7 @@ common network-arbitrary-common
     , http-media   >=0.6  && <0.9
     , http-types   >=0.9  && <0.13
     , network-uri  >=2.6  && <2.8
-    , QuickCheck   >=2.9  && <2.15
+    , QuickCheck   >=2.9  && <2.15 || ^>=2.16
 
 library
   import:           network-arbitrary-common
