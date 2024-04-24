@@ -1,5 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
+{-# HLINT ignore "Evaluate" #-}
 
 -- |
 -- Module      : Network.URI.Arbitrary
