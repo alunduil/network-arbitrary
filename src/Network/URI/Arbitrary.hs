@@ -13,10 +13,6 @@
 -- Arbitrary instances for "Network.URI".
 module Network.URI.Arbitrary () where
 
-import Control.Applicative
-  ( (<$>),
-    (<*>),
-  )
 import Control.Monad
   ( replicateM,
   )
