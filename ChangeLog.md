@@ -6,7 +6,7 @@
 
 ### Added
 
-* GHC testing for 9.0.*, 9.2.*, 9.4.*, 9.6.*, 9.8.*
+* GHC testing for 9.2.*, 9.4.*, 9.6.*, 9.8.*
 * Support for base 4.15, 4.16, 4.17, 4.18, and 4.19
 * Support for bytestring 0.11.1.0 and newer, and 0.12.1.0 and newer
 * Support for QuickCheck 2.15
