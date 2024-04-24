@@ -1,80 +1,79 @@
 {-# LANGUAGE RecordWildCards #-}
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-{-|
-Module      : Network.URI.Arbitrary
-Description : Arbitrary Instances for Network.URI
-Copyright   : (c) Alex Brandt, 2018
-License     : MIT
-
-Arbitrary instances for "Network.URI".
--}
-module Network.URI.Arbitrary
-  ()
-where
+-- |
+-- Module      : Network.URI.Arbitrary
+-- Description : Arbitrary Instances for Network.URI
+-- Copyright   : (c) Alex Brandt, 2018
+-- License     : MIT
+--
+-- Arbitrary instances for "Network.URI".
+module Network.URI.Arbitrary () where
 
 import Control.Applicative
-  ( (<$>)
-  , (<*>)
+  ( (<$>),
+    (<*>),
   )
 import Control.Monad
-  ( replicateM
+  ( replicateM,
   )
 import Data.List
-  ( intercalate
+  ( intercalate,
   )
 import Network.URI
-  ( URI (..)
-  , URIAuth (..)
-  , parseURIReference
-  , uriToString
+  ( URI (..),
+    URIAuth (..),
+    parseURIReference,
+    uriToString,
   )
 import Test.QuickCheck
-  ( Arbitrary (arbitrary, shrink)
-  , Gen
-  , choose
-  , elements
-  , listOf
-  , listOf1
-  , oneof
-  , suchThat
+  ( Arbitrary (arbitrary, shrink),
+    Gen,
+    choose,
+    elements,
+    listOf,
+    listOf1,
+    oneof,
+    suchThat,
   )
 
 instance Arbitrary URI where
   arbitrary = do
-    uriScheme    <- oneof [return "", scheme]
+    uriScheme <- oneof [return "", scheme]
     uriAuthority <- arbitrary :: Gen (Maybe URIAuth)
     uriPath <- path (null uriScheme) $ maybe True emptyAuthority uriAuthority
-    uriQuery     <- oneof [query, return ""]
-    uriFragment  <- oneof [fragment, return ""]
+    uriQuery <- oneof [query, return ""]
+    uriFragment <- oneof [fragment, return ""]
 
-    return URI { .. }
-   where
-    emptyAuthority URIAuth {..} = all null [uriUserInfo, uriRegName, uriPort]
+    return URI {..}
+    where
+      emptyAuthority URIAuth {..} = all null [uriUserInfo, uriRegName, uriPort]
 
-  shrink URI {..} = filter
-    isURI
-    [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment'
-    | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <- shrink
-      (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
-    ]
-   where
-    isURI u = case parseURIReference (uriToString id u "") of
-      Just u' -> u' == u
-      Nothing -> False
-
+  shrink URI {..} =
+    filter
+      isURI
+      [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment'
+        | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <-
+            shrink
+              (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
+      ]
+    where
+      isURI u = case parseURIReference (uriToString id u "") of
+        Just u' -> u' == u
+        Nothing -> False
 
 instance Arbitrary URIAuth where
   arbitrary = URIAuth <$> userinfo <*> host `suchThat` (not . null) <*> port
 
   shrink URIAuth {..} =
     [ URIAuth uriUserInfo' uriRegName' uriPort'
-    | (uriUserInfo', uriRegName', uriPort') <- shrink
-      (uriUserInfo, uriRegName, uriPort)
+      | (uriUserInfo', uriRegName', uriPort') <-
+          shrink
+            (uriUserInfo, uriRegName, uriPort)
     ]
 
 -- * RFC 3986 Generators
+
 --
 --   Some generators are handled by the 'Arbitrary' instances above, and
 --   others are folded into symbols that are preceded or followed by
@@ -90,9 +89,11 @@ userinfo :: Gen String
 userinfo = do
   u <- concat <$> userinfo'
   if null u then return "" else return $ u ++ "@"
- where
-  userinfo' = listOf $ oneof
-    [replicateM 1 $ oneof [unreserved, subDelims, return ':'], percentEncoded]
+  where
+    userinfo' =
+      listOf $
+        oneof
+          [replicateM 1 $ oneof [unreserved, subDelims, return ':'], percentEncoded]
 
 host :: Gen String
 host = oneof [ipLiteral, ipv4Address, regName]
@@ -104,9 +105,11 @@ port = do
 
 ipLiteral :: Gen String
 ipLiteral = do
-  x <- oneof [ipv6Address
-             --, ipvFuture
-                         ]
+  x <-
+    oneof
+      [ ipv6Address
+      -- , ipvFuture
+      ]
   return $ "[" ++ x ++ "]"
 
 {- TODO Check that "Network.URI" implements this correctly.
@@ -118,18 +121,21 @@ ipvFuture =
 -}
 
 ipv6Address :: Gen String
-ipv6Address = concat <$> oneof
-  [ sequence [b 6, ls32]
-  , sequence [return "::", b 5, ls32]
-  , sequence [h16, return "::", b 4, ls32]
-  , sequence [b 1, h16, return "::", b 3, ls32]
-  , sequence [b 2, h16, return "::", b 2, ls32]
-  , sequence [b 3, h16, return "::", b 1, ls32]
-  , sequence [b 4, h16, return "::", ls32]
-  , sequence [b 5, h16, return "::", h16]
-  , sequence [b 6, h16, return "::"]
-  ]
-  where b n = fmap concat $ replicateM n $ fmap (++ ":") h16 :: Gen String
+ipv6Address =
+  concat
+    <$> oneof
+      [ sequence [b 6, ls32],
+        sequence [return "::", b 5, ls32],
+        sequence [h16, return "::", b 4, ls32],
+        sequence [b 1, h16, return "::", b 3, ls32],
+        sequence [b 2, h16, return "::", b 2, ls32],
+        sequence [b 3, h16, return "::", b 1, ls32],
+        sequence [b 4, h16, return "::", ls32],
+        sequence [b 5, h16, return "::", h16],
+        sequence [b 6, h16, return "::"]
+      ]
+  where
+    b n = fmap concat $ replicateM n $ fmap (++ ":") h16 :: Gen String
 
 h16 :: Gen String
 h16 = replicateM 4 hexdig
@@ -144,17 +150,22 @@ decOctet :: Gen String
 decOctet = (show :: Int -> String) <$> choose (0, 255)
 
 regName :: Gen String
-regName = fmap concat $ listOf $ oneof
-  [replicateM 1 unreserved, percentEncoded, replicateM 1 subDelims]
+regName =
+  fmap concat $
+    listOf $
+      oneof
+        [replicateM 1 unreserved, percentEncoded, replicateM 1 subDelims]
 
 path :: Bool -> Bool -> Gen String
-path emptyScheme emptyURIAuth = if emptyURIAuth
-  then oneof
-    [ pathAbsolute
-    , if emptyScheme then pathNoScheme else pathRootless
-    , return ""
-    ]
-  else pathAbEmpty
+path emptyScheme emptyURIAuth =
+  if emptyURIAuth
+    then
+      oneof
+        [ pathAbsolute,
+          if emptyScheme then pathNoScheme else pathRootless,
+          return ""
+        ]
+    else pathAbEmpty
 
 pathAbEmpty :: Gen String
 pathAbEmpty = concat <$> listOf (('/' :) . concat <$> listOf pchar)
@@ -169,21 +180,23 @@ pathRootless :: Gen String
 pathRootless = concat <$> sequence [concat <$> listOf1 pchar, pathAbEmpty]
 
 segment1nc :: Gen String
-segment1nc = oneof
-  [ replicateM 1 unreserved
-  , percentEncoded
-  , replicateM 1 subDelims
-  , replicateM 1 $ return '@'
-  ]
+segment1nc =
+  oneof
+    [ replicateM 1 unreserved,
+      percentEncoded,
+      replicateM 1 subDelims,
+      replicateM 1 $ return '@'
+    ]
 
 pchar :: Gen String
-pchar = oneof
-  [ replicateM 1 unreserved
-  , percentEncoded
-  , replicateM 1 subDelims
-  , replicateM 1 $ return ':'
-  , replicateM 1 $ return '@'
-  ]
+pchar =
+  oneof
+    [ replicateM 1 unreserved,
+      percentEncoded,
+      replicateM 1 subDelims,
+      replicateM 1 $ return ':',
+      replicateM 1 $ return '@'
+    ]
 
 query :: Gen String
 query =

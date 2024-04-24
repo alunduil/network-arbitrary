@@ -1,51 +1,47 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-{-|
-Module      : Network.HTTP.Media.MediaType.Arbitrary
-Description : Arbitrary Instances for Network.HTTP.Media.MediaType
-Copyright   : (c) Alex Brandt, 2018
-License     : MIT
-
-Arbitrary instances for "Network.HTTP.Media.MediaType".
--}
-module Network.HTTP.Media.MediaType.Arbitrary
-  ()
-where
-
-import Prelude hiding
-  ( concat
-  )
+-- |
+-- Module      : Network.HTTP.Media.MediaType.Arbitrary
+-- Description : Arbitrary Instances for Network.HTTP.Media.MediaType
+-- Copyright   : (c) Alex Brandt, 2018
+-- License     : MIT
+--
+-- Arbitrary instances for "Network.HTTP.Media.MediaType".
+module Network.HTTP.Media.MediaType.Arbitrary () where
 
 import Control.Applicative
-  ( (<*>)
+  ( (<*>),
   )
 import Control.Monad
-  ( replicateM
+  ( replicateM,
   )
 import Data.ByteString
-  ( ByteString
-  , append
-  , concat
+  ( ByteString,
+    append,
+    concat,
   )
 import Data.ByteString.Char8
-  ( singleton
+  ( singleton,
   )
 import Data.Functor
-  ( (<$>)
+  ( (<$>),
   )
 import Network.HTTP.Media.MediaType
-  ( MediaType
-  , (//)
-  , (/:)
+  ( MediaType,
+    (//),
+    (/:),
   )
 import Test.QuickCheck
-  ( Arbitrary (arbitrary)
-  , Gen
-  , choose
-  , elements
-  , listOf
-  , oneof
-  , sized
+  ( Arbitrary (arbitrary),
+    Gen,
+    choose,
+    elements,
+    listOf,
+    oneof,
+    sized,
+  )
+import Prelude hiding
+  ( concat,
   )
 
 --
@@ -56,7 +52,7 @@ import Test.QuickCheck
 --       shall simply use restrictedName for the values as well.
 instance Arbitrary MediaType where
   arbitrary = do
-    n  <- (//) <$> restrictedName <*> restrictedName
+    n <- (//) <$> restrictedName <*> restrictedName
     ps <- listOf $ (,) <$> restrictedName <*> restrictedName -- see parameter note above
     return $ foldl (/:) n ps
 
@@ -64,7 +60,7 @@ instance Arbitrary MediaType where
 
 restrictedName :: Gen ByteString
 restrictedName = sized $ \s -> do
-  n  <- choose (0, min 126 s)
+  n <- choose (0, min 126 s)
   rs <- concat <$> replicateM n restrictedNameChar
   (`append` rs) <$> restrictedNameFirst
 
@@ -72,8 +68,10 @@ restrictedNameFirst :: Gen ByteString
 restrictedNameFirst = singleton <$> oneof [alpha, digit]
 
 restrictedNameChar :: Gen ByteString
-restrictedNameChar = singleton <$> oneof
-  [alpha, digit, elements ['!', '#', '$', '&', '-', '^', '_', '.', '+']]
+restrictedNameChar =
+  singleton
+    <$> oneof
+      [alpha, digit, elements ['!', '#', '$', '&', '-', '^', '_', '.', '+']]
 
 -- * RFC 2234 Generators
 

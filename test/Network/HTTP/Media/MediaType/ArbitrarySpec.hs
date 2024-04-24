@@ -1,41 +1,38 @@
-{-|
-Module      : Network.HTTP.Media.MediaType.ArbitrarySpec
-Description : Tests for Network.HTTP.Media.MediaType.Arbitrary
-Copyright   : (c) Alex Brandt, 2018
-License     : MIT
-
-Tests for "Network.HTTP.Media.MediaType.Arbitrary".
--}
+-- |
+-- Module      : Network.HTTP.Media.MediaType.ArbitrarySpec
+-- Description : Tests for Network.HTTP.Media.MediaType.Arbitrary
+-- Copyright   : (c) Alex Brandt, 2018
+-- License     : MIT
+--
+-- Tests for "Network.HTTP.Media.MediaType.Arbitrary".
 module Network.HTTP.Media.MediaType.ArbitrarySpec
-  ( main
-  , spec
+  ( main,
+    spec,
   )
 where
 
-import Prelude hiding
-  ( null
-  )
-
 import Data.ByteString
-  ( null
+  ( null,
   )
 import Data.CaseInsensitive
-  ( original
+  ( original,
   )
 import Network.HTTP.Media.MediaType
-  ( mainType
-  , subType
+  ( mainType,
+    subType,
   )
+import Network.HTTP.Media.MediaType.Arbitrary ()
 import Test.Hspec
-  ( Spec
-  , describe
-  , hspec
+  ( Spec,
+    describe,
+    hspec,
   )
 import Test.Hspec.QuickCheck
-  ( prop
+  ( prop,
   )
-
-import Network.HTTP.Media.MediaType.Arbitrary ()
+import Prelude hiding
+  ( null,
+  )
 
 main :: IO ()
 main = hspec spec
