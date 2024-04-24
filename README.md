@@ -1,36 +1,50 @@
-# Description
+# network-arbitrary
 
-[Arbitrary][arbitrary] Instances for [Network][network-category] Types
+[Homepage](https://github.com/alunduil/network-arbitrary)
+By Alex Brandt <alunduil@gmail.com>
 
-I am providing code in the repository to you under an open source license.
-Because this is my personal repository, the license you receive to my code is
-from me and not my employer (Facebook).
+## Description
 
-# Getting Started
+You can use network-arbitrary to provide Arbitrary instances for Network module types.
 
-Documentation is available on [Hackage][hackage].  A great guide to [QuickCheck][quickcheck] is
-<https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html>.
+## Terms of use
 
-# Reporting Issues
+You are free to use network-arbitrary without any conditions.  See the [LICENSE]
+file for details.
 
-Any issues discovered should be recorded on [github][issues].  If you believe
-you've found an error or have a suggestion for a new feature; please, ensure
-that it is reported.
+## How to use network-arbitrary
 
-If you would like to contribute a fix or new feature; please, submit a pull
-request.  This project follows [git flow][git flow] and utilizes [travis][travis] to automatically
-check pull requests before a manual review.
+```haskell
+{-# LANGUAGE TypeApplications #-}
+module main where
 
-# Contributors
+import Network.URI (URI)
+import Network.URI.Arbitrary ()
 
-The `COPYRIGHT` file contains a list of contributors with their respective
-copyrights and other information.  If you submit a pull request and would like
-attribution; please, add yourself to the `COPYRIGHT` file.
+main = generate (arbitrary @URI) >>= print
+```
+
+## Documentation
+
+* [Hackage][hackage]: Hackage project page for network-arbitrary
+* [The Design and Use of QuickCheck](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html): An excellent guide to using QuickCheck
+* [LICENSE](./LICENSE): The license governing use of network-arbitrary
+* [QuickCheck Arbitrary][arbitrary]: QuickCheck's Arbitrary class documentation
+* [Hackage's Network Category][network-category]: Hackage's Network category
+* [QuickCheck][quickcheck]: QuickCheck's documentation
+
+## Getting Help
+
+* [GitHub Issues][issues]: Support requests, bug reports, and feature requests
+
+## How to Help
+
+* Submit [issues] for problems or questions
+* Submit [pull requests] for proposed changes
 
 [arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
-[git flow]: http://nvie.com/posts/a-successful-git-branching-model/
 [hackage]: https://hackage.haskell.org/package/network-arbitrary
 [issues]: https://github.com/alunduil/network-arbitrary/issues
 [network-category]: https://hackage.haskell.org/packages/#cat:Network
+[pull requests]: https://github.com/alunduil/network-arbitrary/pulls
 [quickcheck]: https://hackage.haskell.org/package/QuickCheck
-[travis]: https://travis-ci.org/alunduil/network-arbitrary
