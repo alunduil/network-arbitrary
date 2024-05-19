@@ -2,6 +2,10 @@
 
 ## unreleased
 
+### Added
+
+* Support for base 4.20.0 and newer
+
 ## 1.0.0.0  -- 2024-04-24
 
 ### Added
