@@ -6,6 +6,15 @@
 
 * Support for base 4.20.0 and newer
 
+### Deprecated
+
+* GHC testing of 9.4
+* GHC testing of 9.6
+
+### Removed
+
+* GHC testing for older than 9.4
+
 ## 1.0.0.0  -- 2024-04-24
 
 ### Added
