@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               network-arbitrary
-version:            1.0.0.0
+version:            1.0.0.1
 license:            MIT
 license-file:       LICENSE
 copyright:          (c) 2018 Alex Brandt
@@ -29,7 +29,7 @@ source-repository head
 common network-arbitrary-common
   build-depends:
     , base         >=4.6  && <4.15   || ^>=4.15.0.0 || ^>=4.16.0.0 || ^>=4.17.0.0 || ^>=4.18.0.0 || ^>=4.19.0.0 || ^>=4.20.0
-    , bytestring   >=0.10 && <0.11   || ^>=0.11.1.0 || ^>=0.12.1.0
+    , bytestring   >=0.10 && <0.11   || ^>=0.11.1.0 || ^>=0.12.0.0
     , http-media   >=0.6  && <0.9
     , http-types   >=0.9  && <0.13
     , network-uri  >=2.6  && <2.8
