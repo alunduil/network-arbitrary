@@ -58,7 +58,7 @@ test-suite test
     , hspec             >=2.4 && <2.8 || ^>=2.11.8
     , test-invariant    >=0.4 && <0.5
 
-  build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8
+  build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8 || ^>=2.11.8
   other-modules:
     Network.HTTP.Media.MediaType.Arbitrary
     Network.HTTP.Media.MediaType.ArbitrarySpec
