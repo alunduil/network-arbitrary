@@ -16,20 +16,21 @@ repos:
       - id: trailing-whitespace
   - repo: local
     hooks:
-      - id: haskell-ci regenerate
-        name: haskell-ci regenerate
-        entry: haskell-ci regenerate
-        language: haskell
-        additional_dependencies:
-          - haskell-ci-0.18.1
-        files: '(^.github/workflows/haskell-ci.yml$)|(\.cabal$)'
-        pass_filenames: false
+      # Temporarily disabled due to incompatibility with base >= 4.20
+      # - id: haskell-ci regenerate
+      #   name: haskell-ci regenerate
+      #   entry: haskell-ci regenerate
+      #   language: haskell
+      #   additional_dependencies:
+      #     - haskell-ci-0.18.1
+      #   files: '(^.github/workflows/haskell-ci.yml$)|(\.cabal$)'
+      #   pass_filenames: false
       - id: hlint
         name: hlint
         entry: hlint
         language: haskell
         additional_dependencies:
-          - hlint-3.6.1
+          - hlint-3.10
         types_or: ["haskell", "literate-haskell"]
       - id: cabal check
         name: cabal check
@@ -42,15 +43,16 @@ repos:
         entry: ormolu
         language: haskell
         additional_dependencies:
-          - ormolu-0.7.3.0
+          - ormolu-0.8.0.0
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]
-      - id: cabal-fmt
-        name: cabal-fmt
-        entry: cabal-fmt
-        language: haskell
-        additional_dependencies:
-          - cabal-fmt-0.1.9
-        files: '\.cabal$'
-        exclude: '\.golden\.cabal$'
-        args: ["-i"]
+      # Temporarily disabled due to incompatibility with base >= 4.20
+      # - id: cabal-fmt
+      #   name: cabal-fmt
+      #   entry: cabal-fmt
+      #   language: haskell
+      #   additional_dependencies:
+      #     - cabal-fmt-0.1.9
+      #   files: '\.cabal$'
+      #   exclude: '\.golden\.cabal$'
+      #   args: ["-i"]
