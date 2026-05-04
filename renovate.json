@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "baseBranchPatterns": ["master"],
+  "reviewers": ["alunduil"],
+  "pre-commit": { "enabled": true },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["hspec", "hspec-discover", "QuickCheck"],
+      "groupName": "haskell test stack"
+    }
+  ]
+}
