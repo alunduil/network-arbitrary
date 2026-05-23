@@ -4,6 +4,10 @@
   "baseBranchPatterns": ["master"],
   "reviewers": ["alunduil"],
   "pre-commit": { "enabled": true },
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "vulnerabilityAlerts": { "minimumReleaseAge": "0 days" },
+  "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
       "matchUpdateTypes": ["patch"],

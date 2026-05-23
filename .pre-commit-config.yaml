@@ -14,6 +14,11 @@ repos:
       - id: destroyed-symlinks
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 43.150.0
+    hooks:
+      - id: renovate-config-validator
+        args: [--strict, --no-global]
   - repo: local
     hooks:
       - id: haskell-ci regenerate
