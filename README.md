@@ -41,6 +41,7 @@ main = generate (arbitrary @URI) >>= print
 
 * Submit [issues] for problems or questions
 * Submit [pull requests] for proposed changes
+* See [CONTRIBUTING](./CONTRIBUTING.md) for dev setup, testing, and the release procedure
 
 [arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
 [hackage]: https://hackage.haskell.org/package/network-arbitrary
