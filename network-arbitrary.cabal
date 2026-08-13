@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               network-arbitrary
-version:            1.0.0.2
+version:            1.0.0.1
 license:            MIT
 license-file:       LICENSE
 copyright:          (c) 2018 Alex Brandt

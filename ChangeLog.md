@@ -2,8 +2,6 @@
 
 ## unreleased
 
-## 1.0.0.2  -- 2026-08-13
-
 ### Added
 
 * Support for base 4.21 and 4.22
