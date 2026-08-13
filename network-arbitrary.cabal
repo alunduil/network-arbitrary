@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               network-arbitrary
-version:            1.0.0.1
+version:            1.0.0.2
 license:            MIT
 license-file:       LICENSE
 copyright:          (c) 2018 Alex Brandt
@@ -16,7 +16,7 @@ description:
 
 category:           Testing
 tested-with:
-  GHC >=9.4 && <9.5 || >=9.6 && <9.7 || >=9.8 && <9.9 || >=9.10 && <9.11
+  GHC ==9.6.* || ==9.8.* || ==9.10.* || ==9.12.* || ==9.14.*
 
 extra-source-files:
   ChangeLog.md
@@ -28,12 +28,12 @@ source-repository head
 
 common network-arbitrary-common
   build-depends:
-    , base         >=4.6  && <4.15   || ^>=4.15.0.0 || ^>=4.16.0.0 || ^>=4.17.0.0 || ^>=4.18.0.0 || ^>=4.19.0.0 || ^>=4.20.0
+    , base         >=4.6  && <4.15   || ^>=4.15.0.0 || ^>=4.16.0.0 || ^>=4.17.0.0 || ^>=4.18.0.0 || ^>=4.19.0.0 || ^>=4.20.0 || ^>=4.21.0 || ^>=4.22.0
     , bytestring   >=0.10 && <0.11   || ^>=0.11.1.0 || ^>=0.12.0.0
     , http-media   >=0.6  && <0.9
     , http-types   >=0.9  && <0.13
     , network-uri  >=2.6  && <2.8
-    , QuickCheck   ^>=2.9 || ^>=2.10 || ^>=2.11     || ^>=2.12     || ^>=2.13     || ^>=2.14     || ^>=2.15
+    , QuickCheck   ^>=2.9 || ^>=2.10 || ^>=2.11     || ^>=2.12     || ^>=2.13     || ^>=2.14     || ^>=2.15     || ^>=2.16     || ^>=2.17     || ^>=2.18
 
 library
   import:           network-arbitrary-common
@@ -58,7 +58,7 @@ test-suite test
     , hspec             >=2.4 && <2.8 || ^>=2.11.8
     , test-invariant    >=0.4 && <0.5
 
-  build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8
+  build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8 || ^>=2.11.8
   other-modules:
     Network.HTTP.Media.MediaType.Arbitrary
     Network.HTTP.Media.MediaType.ArbitrarySpec

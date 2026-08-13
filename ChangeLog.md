@@ -2,6 +2,25 @@
 
 ## unreleased
 
+## 1.0.0.2  -- 2026-08-13
+
+### Added
+
+* Support for base 4.21 and 4.22, so the package builds on GHC 9.12 and 9.14
+* Support for QuickCheck 2.16, 2.17, and 2.18
+* GHC testing for 9.12 and 9.14
+
+### Changed
+
+* Test suite accepts hspec-discover 2.11.8 and newer, matching the hspec bound
+  it already allowed
+* CI builds and tests the sdist tarball against the published bounds across
+  GHC 9.6 through 9.14 on Linux and macOS
+
+### Removed
+
+* GHC testing for 9.4
+
 ## 1.0.0.1  -- 2024-05-26
 
 ### Added
