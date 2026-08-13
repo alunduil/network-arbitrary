@@ -39,9 +39,9 @@ jobs:
       - name: Update Hackage index
         run: cabal update
 
-      # Everything below builds from the sdist tarball, not the working
-      # tree: it exercises the bare published bounds a Hackage consumer
-      # faces and validates that every source and test file is packaged.
+      # Building from the sdist exercises the bare published bounds a
+      # Hackage consumer faces, and catches a source or test file
+      # missing from the tarball.
       - name: Build sdist
         run: cabal sdist all
 
