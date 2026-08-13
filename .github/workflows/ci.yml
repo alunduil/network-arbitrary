@@ -83,7 +83,7 @@ jobs:
 
       - name: Test
         working-directory: sdist-build
-        run: cabal test all --enable-tests --test-show-details=direct
+        run: cabal test all --test-show-details=direct
 
       - name: Check package metadata
         working-directory: sdist-build
