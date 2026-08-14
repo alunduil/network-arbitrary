@@ -2,6 +2,20 @@
 
 ## unreleased
 
+### Added
+
+* Support for base 4.21 and 4.22
+* Support for QuickCheck 2.16, 2.17, and 2.18
+* GHC testing for 9.12 and 9.14
+
+### Changed
+
+* Test suite accepts hspec-discover 2.11.8 and newer
+
+### Removed
+
+* GHC testing for 9.4
+
 ## 1.0.0.1  -- 2024-05-26
 
 ### Added
