@@ -98,6 +98,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    # The step condition below reads this rather than secrets directly,
+    # which the steps context cannot see.
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -125,9 +130,13 @@ jobs:
           target: cabal:test
           excludes: Main,Network.HTTP.Media.MediaType.ArbitrarySpec,Network.HTTP.Types.Method.ArbitrarySpec,Network.URI.ArbitrarySpec
 
+      # Pull requests from forks get no secrets, so skip the upload
+      # rather than failing them on it. Errors uploading with a token
+      # in hand still fail the job.
       - name: Upload to Codecov
+        if: env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
           files: ${{ steps.report.outputs.report }}
           fail_ci_if_error: true
