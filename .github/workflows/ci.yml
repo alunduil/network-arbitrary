@@ -114,23 +114,18 @@ jobs:
       # Coverage builds from the working tree, not the sdist the build
       # job uses: the instrumented .mix/.tix paths then map straight onto
       # the repo's src/ layout that Codecov reports against.
-      - name: Configure with coverage
-        run: cabal configure --enable-tests --enable-coverage
+      - name: Test with coverage
+        run: cabal test all --enable-coverage --test-show-details=direct
 
-      - name: Build
-        run: cabal build all
-
-      - name: Test
-        run: cabal test all --test-show-details=direct
-
-      # excludes drops the test components so the report measures the
-      # library modules alone.
+      # excludes names the test component's own modules, so the report
+      # measures the library alone. A new *Spec module has to be added
+      # here too, or its own coverage inflates the number.
       - name: Generate coverage report
         id: report
         uses: 8c6794b6/hpc-codecov-action@f943f40733e5390825b12d72165cad991e44340c # v4.3.0
         with:
           target: cabal:test
-          excludes: Main,Paths_network_arbitrary,Network.HTTP.Media.MediaType.ArbitrarySpec,Network.HTTP.Types.Method.ArbitrarySpec,Network.URI.ArbitrarySpec
+          excludes: Main,Network.HTTP.Media.MediaType.ArbitrarySpec,Network.HTTP.Types.Method.ArbitrarySpec,Network.URI.ArbitrarySpec
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
