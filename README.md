@@ -1,5 +1,11 @@
 # network-arbitrary
 
+[![Hackage](https://img.shields.io/hackage/v/network-arbitrary.svg)](https://hackage.haskell.org/package/network-arbitrary)
+[![CI](https://github.com/alunduil/network-arbitrary/actions/workflows/ci.yml/badge.svg)](https://github.com/alunduil/network-arbitrary/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/alunduil/network-arbitrary/branch/main/graph/badge.svg)](https://codecov.io/gh/alunduil/network-arbitrary)
+[![License](https://img.shields.io/github/license/alunduil/network-arbitrary.svg)](LICENSE)
+[![GHC](https://img.shields.io/badge/GHC-9.6%20%7C%209.8%20%7C%209.10%20%7C%209.12%20%7C%209.14-blue.svg)](https://www.haskell.org/ghc/)
+
 [Homepage](https://github.com/alunduil/network-arbitrary)
 By Alex Brandt <alunduil@gmail.com>
 

@@ -54,19 +54,17 @@ test-suite test
   type:               exitcode-stdio-1.0
   main-is:            Spec.hs
   build-depends:
-    , case-insensitive  >=1.2 && <1.3
-    , hspec             >=2.4 && <2.8 || ^>=2.11.8
-    , test-invariant    >=0.4 && <0.5
+    , case-insensitive   >=1.2 && <1.3
+    , hspec              >=2.4 && <2.8 || ^>=2.11.8
+    , network-arbitrary
+    , test-invariant     >=0.4 && <0.5
 
   build-tool-depends: hspec-discover:hspec-discover >=2.4 && <2.8 || ^>=2.11.8
   other-modules:
-    Network.HTTP.Media.MediaType.Arbitrary
     Network.HTTP.Media.MediaType.ArbitrarySpec
-    Network.HTTP.Types.Method.Arbitrary
     Network.HTTP.Types.Method.ArbitrarySpec
-    Network.URI.Arbitrary
     Network.URI.ArbitrarySpec
 
-  hs-source-dirs:     src test
+  hs-source-dirs:     test
   default-language:   Haskell2010
   ghc-options:        -Wall -Wcompat

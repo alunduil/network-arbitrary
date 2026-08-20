@@ -92,3 +92,51 @@ jobs:
       - name: Haddock
         working-directory: sdist-build
         run: cabal haddock all
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # The step condition below reads this rather than secrets directly,
+    # which the steps context cannot see.
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up GHC
+        uses: haskell-actions/setup@6037f33647c3f17758a2356c80fc4a53d7e0685d # v2.12.0
+        with:
+          ghc-version: "9.14"
+          cabal-version: latest
+
+      - name: Update Hackage index
+        run: cabal update
+
+      # Builds from the working tree, not the sdist: each .mix file
+      # records its source path, and Codecov reports against src/.
+      - name: Test with coverage
+        run: cabal test all --enable-coverage --test-show-details=direct
+
+      # A new *Spec module has to be listed here too, or it counts
+      # toward library coverage. hpc-codecov matches literal names.
+      - name: Generate coverage report
+        id: report
+        uses: 8c6794b6/hpc-codecov-action@f943f40733e5390825b12d72165cad991e44340c # v4.3.0
+        with:
+          target: cabal:test
+          excludes: Main,Network.HTTP.Media.MediaType.ArbitrarySpec,Network.HTTP.Types.Method.ArbitrarySpec,Network.URI.ArbitrarySpec
+
+      # Pull requests from forks get no secrets, so skip the upload
+      # rather than failing them on it. Errors uploading with a token
+      # in hand still fail the job.
+      - name: Upload to Codecov
+        if: env.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ env.CODECOV_TOKEN }}
+          files: ${{ steps.report.outputs.report }}
+          fail_ci_if_error: true
