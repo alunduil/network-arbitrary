@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  # The drift check files a tracking issue when the matrix ages out.
   issues: write
 
 concurrency:
@@ -25,9 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Policy (#112): test every GHC major series upstream hasn't end-of-
-      # lifed (endoflife.date `eol: false`), so the matrix spans the full
-      # still-alive range rather than a hardcoded count.
+      # Policy (#112): test every GHC series that upstream hasn't
+      # end-of-lifed.
       - name: Detect drift
         id: check
         run: |
@@ -36,9 +34,8 @@ jobs:
           ci_file=.github/workflows/ci.yml
           cabal_file=network-arbitrary.cabal
 
-          # An empty set means an upstream schema change or a moved field,
-          # not that every series drifted. Abort rather than file a
-          # spurious drift issue.
+          # An empty set means a moved field or an upstream schema
+          # change rather than a real drift, so abort the run.
           require_series() {
             if [ -z "$2" ]; then
               echo "no GHC series parsed from $1; aborting" >&2
@@ -54,10 +51,10 @@ jobs:
           matrix=$(yq '.jobs.build.strategy.matrix.ghc[]' "$ci_file" | sort -V)
           require_series "$ci_file" "$matrix"
 
-          # tested-with spells each series as a `>=X.Y && <X.Y+1` clause, so
-          # the lower bounds are the series and the upper bounds are noise.
-          # Trailing `|| true` because grep exits 1 on no match, which
-          # pipefail would turn into a bare abort before the guard below.
+          # tested-with spells each series as `>=X.Y && <X.Y+1`, so the
+          # series are its lower bounds. grep exits 1 on no match and
+          # pipefail would abort with no message, so `|| true` leaves the
+          # empty set for require_series to report.
           tested=$(sed -n '/^tested-with:/,/^$/p' "$cabal_file" \
             | grep -oE '>=[0-9]+\.[0-9]+' \
             | grep -oE '[0-9]+\.[0-9]+' | sort -V || true)
@@ -78,12 +75,12 @@ jobs:
           labels:
             - enhancement
           ---
-          The CI matrix and \`tested-with\` should track every GHC major
-          series upstream hasn't end-of-lifed (policy: #112).
+          The CI matrix and \`tested-with\` should track every GHC series
+          that upstream hasn't end-of-lifed (policy: #112).
 
           | Source | Series |
           | --- | --- |
-          | Expected (endoflife.date, not end-of-life) | $(join "$expected") |
+          | Expected (endoflife.date) | $(join "$expected") |
           | CI matrix (\`$ci_file\`) | $(join "$matrix") |
           | \`tested-with\` (\`$cabal_file\`) | $(join "$tested") |
 
@@ -91,9 +88,8 @@ jobs:
           (CI/packaging-only is a patch).
           EOF
 
-      # update_existing overwrites the open tracking issue with the same
-      # title rather than filing a duplicate, and files a fresh one only
-      # when none is open. Title and labels come from the front matter above.
+      # update_existing matches on title, so the fixed title above keeps
+      # every drift run on one issue instead of filing duplicates.
       - name: File or refresh drift issue
         if: steps.check.outputs.drift == 'true'
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
