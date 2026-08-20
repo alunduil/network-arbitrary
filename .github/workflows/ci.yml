@@ -111,15 +111,13 @@ jobs:
       - name: Update Hackage index
         run: cabal update
 
-      # Coverage builds from the working tree, not the sdist the build
-      # job uses: the instrumented .mix/.tix paths then map straight onto
-      # the repo's src/ layout that Codecov reports against.
+      # Builds from the working tree, not the sdist: each .mix file
+      # records its source path, and Codecov reports against src/.
       - name: Test with coverage
         run: cabal test all --enable-coverage --test-show-details=direct
 
-      # excludes names the test component's own modules, so the report
-      # measures the library alone. A new *Spec module has to be added
-      # here too, or its own coverage inflates the number.
+      # A new *Spec module has to be listed here too, or it counts
+      # toward library coverage. hpc-codecov matches literal names.
       - name: Generate coverage report
         id: report
         uses: 8c6794b6/hpc-codecov-action@f943f40733e5390825b12d72165cad991e44340c # v4.3.0
