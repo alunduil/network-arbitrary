@@ -10,7 +10,7 @@
 
 ### Changed
 
-* Test suite accepts hspec-discover 2.11.8 and newer
+* Test suite runs under tasty instead of hspec
 
 ### Removed
 
