@@ -19,14 +19,15 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
+  # hlint and ormolu are invoked from PATH. Renovate's pre-commit manager only
+  # tracks third-party hooks with a `rev:` field, so the pinned versions for
+  # these tools live in `.github/workflows/pre-commit.yml`.
   - repo: local
     hooks:
       - id: hlint
         name: hlint
         entry: hlint
-        language: haskell
-        additional_dependencies:
-          - hlint-3.6.1
+        language: system
         types_or: ["haskell", "literate-haskell"]
       - id: cabal check
         name: cabal check
@@ -37,17 +38,6 @@ repos:
       - id: ormolu
         name: ormolu
         entry: ormolu
-        language: haskell
-        additional_dependencies:
-          - ormolu-0.7.3.0
+        language: system
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]
-      - id: cabal-fmt
-        name: cabal-fmt
-        entry: cabal-fmt
-        language: haskell
-        additional_dependencies:
-          - cabal-fmt-0.1.9
-        files: '\.cabal$'
-        exclude: '\.golden\.cabal$'
-        args: ["-i"]
