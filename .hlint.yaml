@@ -1,0 +1,8 @@
+# HLint configuration for network-arbitrary.
+# Reference: https://github.com/ndmitchell/hlint#readme
+
+- group: {name: partial, enabled: true}
+- group: {name: partial-strict, enabled: true}
+
+# The `extra` group is deliberately off: every hint in it rewrites toward
+# functions from the `extra` package, which this library does not depend on.
