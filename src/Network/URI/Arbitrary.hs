@@ -52,9 +52,9 @@ instance Arbitrary URI where
     filter
       isURI
       [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment'
-        | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <-
-            shrink
-              (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
+      | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <-
+          shrink
+            (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
       ]
     where
       isURI u = case parseURIReference (uriToString id u "") of
@@ -66,9 +66,9 @@ instance Arbitrary URIAuth where
 
   shrink URIAuth {..} =
     [ URIAuth uriUserInfo' uriRegName' uriPort'
-      | (uriUserInfo', uriRegName', uriPort') <-
-          shrink
-            (uriUserInfo, uriRegName, uriPort)
+    | (uriUserInfo', uriRegName', uriPort') <-
+        shrink
+          (uriUserInfo, uriRegName, uriPort)
     ]
 
 -- * RFC 3986 Generators

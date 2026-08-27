@@ -5,13 +5,30 @@ on:
   push:
     branches: [main]
 
+env:
+  # PVP allows a fourth component, which Renovate's default semver coercion
+  # reads as unstable — `ignoreUnstable` then hides every update. `loose`
+  # compares components directly.
+  # renovate: datasource=github-releases depName=ndmitchell/hlint versioning=loose extractVersion=^v(?<version>.+)$
+  HLINT_VERSION: "3.10"
+  # renovate: datasource=github-releases depName=tweag/ormolu versioning=loose
+  ORMOLU_VERSION: "0.8.1.1"
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
-    - uses: haskell-actions/setup@cd0d9bdd65b20557f41bea4dbe43d0b5fbbfe553 # v2
+    - name: Set up HLint
+      uses: haskell-actions/hlint-setup@fe9cd1cd1af94a23900c06738e73f6ddb092966a # v2
       with:
-        ghc-version: '9.4.7'
+        version: ${{ env.HLINT_VERSION }}
+    - name: Install Ormolu
+      run: |
+        mkdir -p "$HOME/.local/bin"
+        curl -fsSL -o /tmp/ormolu.zip \
+          "https://github.com/tweag/ormolu/releases/download/${ORMOLU_VERSION}/ormolu-x86_64-linux.zip"
+        unzip -j /tmp/ormolu.zip ormolu -d "$HOME/.local/bin"
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
     - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
