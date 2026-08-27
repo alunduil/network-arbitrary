@@ -6,10 +6,9 @@ on:
     branches: [main]
 
 env:
-  # ormolu versions with PVP, whose four-component releases the default
-  # semver-coerced versioning reports as unstable — `ignoreUnstable` then hides
-  # every update. `loose` compares them component-wise instead, and costs
-  # nothing on hlint's shorter tags. Only hlint prefixes its tags with `v`.
+  # PVP allows a fourth component, which Renovate's default semver coercion
+  # reads as unstable — `ignoreUnstable` then hides every update. `loose`
+  # compares components directly.
   # renovate: datasource=github-releases depName=ndmitchell/hlint versioning=loose extractVersion=^v(?<version>.+)$
   HLINT_VERSION: "3.10"
   # renovate: datasource=github-releases depName=tweag/ormolu versioning=loose
