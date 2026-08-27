@@ -31,6 +31,5 @@ jobs:
         curl -fsSL -o /tmp/ormolu.zip \
           "https://github.com/tweag/ormolu/releases/download/${ORMOLU_VERSION}/ormolu-x86_64-linux.zip"
         unzip -j /tmp/ormolu.zip ormolu -d "$HOME/.local/bin"
-        chmod +x "$HOME/.local/bin/ormolu"
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
     - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
