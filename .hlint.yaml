@@ -1,0 +1,5 @@
+- group: {name: partial, enabled: true}
+- group: {name: partial-strict, enabled: true}
+
+# The `extra` group stays off: every hint in it rewrites toward the `extra`
+# package, which this library does not depend on.
