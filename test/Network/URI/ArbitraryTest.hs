@@ -11,11 +11,15 @@ module Network.URI.ArbitraryTest
 where
 
 import Network.URI
-  ( isURIReference,
+  ( URI,
+    isURIReference,
     parseURIReference,
     uriToString,
   )
 import Network.URI.Arbitrary ()
+import Test.Invariant
+  ( (<=>),
+  )
 import Test.Tasty
   ( TestTree,
     testGroup,
@@ -24,12 +28,19 @@ import Test.Tasty.QuickCheck
   ( testProperty,
   )
 
+-- | @uriToString@ maps the userinfo component through its first argument
+-- so callers can redact credentials. Round-tripping needs it verbatim.
+render :: URI -> String
+render u = uriToString id u ""
+
 tests :: TestTree
 tests =
   testGroup
     "Network.URI.Arbitrary"
-    [ testProperty "isURIReference (uriToString id u \"\")" $
-        \u -> isURIReference (uriToString id u ""),
-      testProperty "Just u == parseURIReference (uriToString id u \"\")" $
-        \u -> Just u == parseURIReference (uriToString id u "")
+    [ testProperty "isURIReference . render" $
+        isURIReference . render,
+      testProperty "parseURIReference . render <=> Just" $
+        parseURIReference
+          . render
+          <=> Just
     ]

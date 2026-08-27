@@ -11,9 +11,9 @@ module Main
   )
 where
 
-import qualified Network.HTTP.Media.MediaType.ArbitraryTest
-import qualified Network.HTTP.Types.Method.ArbitraryTest
-import qualified Network.URI.ArbitraryTest
+import qualified Network.HTTP.Media.MediaType.ArbitraryTest as MediaType
+import qualified Network.HTTP.Types.Method.ArbitraryTest as Method
+import qualified Network.URI.ArbitraryTest as URI
 import Test.Tasty
   ( defaultMain,
     testGroup,
@@ -24,7 +24,7 @@ main =
   defaultMain $
     testGroup
       "network-arbitrary"
-      [ Network.HTTP.Media.MediaType.ArbitraryTest.tests,
-        Network.HTTP.Types.Method.ArbitraryTest.tests,
-        Network.URI.ArbitraryTest.tests
+      [ MediaType.tests,
+        Method.tests,
+        URI.tests
       ]

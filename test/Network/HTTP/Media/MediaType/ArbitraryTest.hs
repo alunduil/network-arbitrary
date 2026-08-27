@@ -11,10 +11,12 @@ module Network.HTTP.Media.MediaType.ArbitraryTest
 where
 
 import Data.ByteString
-  ( null,
+  ( ByteString,
+    null,
   )
 import Data.CaseInsensitive
-  ( original,
+  ( CI,
+    original,
   )
 import Network.HTTP.Media.MediaType
   ( mainType,
@@ -32,10 +34,13 @@ import Prelude hiding
   ( null,
   )
 
+nonEmpty :: CI ByteString -> Bool
+nonEmpty = not . null . original
+
 tests :: TestTree
 tests =
   testGroup
     "Network.HTTP.Media.MediaType.Arbitrary"
-    [ testProperty "not . null . mainType" $ not . null . original . mainType,
-      testProperty "not . null . subType" $ not . null . original . subType
+    [ testProperty "nonEmpty . mainType" $ nonEmpty . mainType,
+      testProperty "nonEmpty . subType" $ nonEmpty . subType
     ]
