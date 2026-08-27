@@ -28,8 +28,8 @@ import Test.Tasty.QuickCheck
   ( testProperty,
   )
 
--- | @uriToString@ maps the userinfo component through its first argument
--- so callers can redact credentials. Round-tripping needs it verbatim.
+-- id keeps the password that URI's Show instance would hide, which
+-- round-tripping needs.
 render :: URI -> String
 render u = uriToString id u ""
 

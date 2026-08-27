@@ -4,8 +4,8 @@
 -- Copyright   : (c) Alex Brandt, 2018
 -- License     : MIT
 --
--- Runs every test module. A new module has to be listed here and in
--- @other-modules@; nothing discovers it.
+-- List a new test module here and in @other-modules@; nothing
+-- discovers it.
 module Main
   ( main,
   )
