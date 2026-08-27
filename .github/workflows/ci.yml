@@ -121,14 +121,14 @@ jobs:
       - name: Test with coverage
         run: cabal test all --enable-coverage --test-show-details=direct
 
-      # A new *Spec module has to be listed here too, or it counts
+      # A new *Test module has to be listed here too, or it counts
       # toward library coverage. hpc-codecov matches literal names.
       - name: Generate coverage report
         id: report
         uses: 8c6794b6/hpc-codecov-action@f943f40733e5390825b12d72165cad991e44340c # v4.3.0
         with:
           target: cabal:test
-          excludes: Main,Network.HTTP.Media.MediaType.ArbitrarySpec,Network.HTTP.Types.Method.ArbitrarySpec,Network.URI.ArbitrarySpec
+          excludes: Main,Network.HTTP.Media.MediaType.ArbitraryTest,Network.HTTP.Types.Method.ArbitraryTest,Network.URI.ArbitraryTest
 
       # Pull requests from forks get no secrets, so skip the upload
       # rather than failing them on it. Errors uploading with a token

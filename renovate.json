@@ -14,7 +14,7 @@
       "automerge": true
     },
     {
-      "matchPackageNames": ["hspec", "hspec-discover", "QuickCheck"],
+      "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
     }
   ]
