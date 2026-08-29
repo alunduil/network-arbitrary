@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 concurrency:
-  # No cancel-in-progress: a truncated sweep loses the operations-per-run
-  # resume cache and restarts from the first pull request.
+  # Serialise a dispatched run against the scheduled one: two sweeps in
+  # flight would both comment on the same pull request.
   group: ${{ github.workflow }}
 
 jobs:
@@ -21,8 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      # `actions: write` is omitted: it covers only the resume cache, so a
-      # truncated run warns and restarts rather than failing.
+      # No `actions` scope, so the resume cache actions/stale keeps for
+      # sweeps that exceed operations-per-run stays inert: its cache lookup
+      # fails, is swallowed to a debug line, and every run re-scans from the
+      # first pull request. Harmless until the sweep outgrows one run.
       issues: write
       pull-requests: write
     steps:
@@ -43,6 +45,6 @@ jobs:
             comment or a push clears the label and restarts the clock. Otherwise
             this closes in another 14 days.
           close-pr-message: >-
-            Closing this after 44 quiet days. That isn't a call on the change
-            itself, and nothing is lost: the branch stays where it is, so
+            Closing this after another 14 quiet days. That isn't a call on the
+            change itself, and nothing is lost: the branch stays where it is, so
             comment here if you want to pick it back up and I'll reopen it.
