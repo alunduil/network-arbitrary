@@ -11,8 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  # Serialise a dispatched run against the scheduled one: two sweeps in
-  # flight would both comment on the same pull request.
+  # Two sweeps in flight would both comment on the same pull request.
   group: ${{ github.workflow }}
 
 jobs:
@@ -21,15 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      # No `actions` scope, so the resume cache actions/stale keeps for
-      # sweeps that exceed operations-per-run stays inert: its cache lookup
-      # fails, is swallowed to a debug line, and every run re-scans from the
-      # first pull request. Harmless until the sweep outgrows one run.
+      # `actions` is omitted on purpose: it only lets actions/stale resume a
+      # sweep stopped at operations-per-run, and re-scanning from the first
+      # pull request costs nothing at this repo's size.
       issues: write
       pull-requests: write
     steps:
-      # Both issue legs are disabled, not just marking: an issue already
-      # carrying the label would otherwise stay eligible for closing.
+      # Disabling only the marking leg would leave an issue that already
+      # carries the label eligible for closing.
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
           days-before-issue-stale: -1
