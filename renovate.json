@@ -3,6 +3,7 @@
   "extends": ["config:best-practices"],
   "baseBranchPatterns": ["master"],
   "reviewers": ["alunduil"],
+  "labels": ["dependencies"],
   "pre-commit": { "enabled": true },
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
