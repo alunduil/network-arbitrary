@@ -1,4 +1,4 @@
-name: Stale
+name: Daily
 
 # Offset from the hour: on-the-hour schedules queue behind platform peak load.
 on:
