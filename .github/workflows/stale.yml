@@ -25,6 +25,6 @@ jobs:
         stale-pr-message: 'Stale pull request message'
         stale-issue-label: 'no-issue-activity'
         stale-pr-label: 'no-pr-activity'
-        # Closing a Renovate PR tells Renovate the version is unwanted and it
-        # will not re-offer it.
+        # Renovate reads a closed PR as a rejected version and never
+        # re-offers it.
         exempt-pr-labels: 'dependencies'

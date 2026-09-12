@@ -13,7 +13,7 @@
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
-      "description": "These update types carry no release timestamp, so the minimumReleaseAge bake above would hold them as never-stable and cut no branch at all. Removing this entry silently stops all digest pinning and lock file maintenance.",
+      "description": "These update types carry no release timestamp, so minimumReleaseAge treats them as never stable and cuts no branch. Deleting this rule silently disables digest pinning and lock file maintenance.",
       "matchUpdateTypes": [
         "pin",
         "pinDigest",
