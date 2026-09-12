@@ -10,10 +10,13 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: hackage
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: haskell-actions/setup@cd0d9bdd65b20557f41bea4dbe43d0b5fbbfe553 # v2
       - name: cabal sdist
         run: cabal sdist
       - name: cabal upload
-        run: cabal upload --publish --username=${{ secrets.HACKAGE_USERNAME }} --password=${{ secrets.HACKAGE_PASSWORD }} dist-newstyle/sdist/*.tar.gz
+        env:
+          HACKAGE_API_KEY: ${{ secrets.HACKAGE_API_KEY }}
+        run: cabal upload --publish --token="$HACKAGE_API_KEY" dist-newstyle/sdist/*.tar.gz
