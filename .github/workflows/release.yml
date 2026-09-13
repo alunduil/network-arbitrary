@@ -1,0 +1,147 @@
+name: Release
+
+# Cuts a release without a human choosing the version: the bump is derived
+# from an interface diff against what Hackage last published (see
+# scripts/compute-version.sh), and a run where nothing shippable changed
+# stops after the computation.
+#
+# Every step lives in this one workflow deliberately. Anything GITHUB_TOKEN
+# causes -- a pushed tag, a merged pull request, a created release -- starts
+# no further workflow run, so a chain that handed off to ci.yml or a
+# release-triggered publish would silently never fire.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monday morning, after the week's Renovate and bounds-bump pull
+    # requests have had time to land. GitHub applies `timezone`, DST
+    # included, so this stays 09:00 local.
+    - cron: "0 9 * * 1"
+      timezone: "Europe/London"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Compute, verify, and publish
+    runs-on: ubuntu-latest
+    environment: hackage
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The release decision compares HEAD against the tag of the last
+          # published version, so the full history and its tags are needed.
+          fetch-depth: 0
+
+      - name: Set up GHC
+        uses: haskell-actions/setup@6037f33647c3f17758a2356c80fc4a53d7e0685d # v2.12.0
+        with:
+          ghc-version: "9.14"
+          cabal-version: latest
+
+      - name: Update Hackage index
+        run: cabal update
+
+      - name: Compute next version
+        id: version
+        run: ./scripts/compute-version.sh
+
+      # ci.yml already built this source across the whole matrix on the way
+      # into main. What it has not seen is the sdist carrying the new
+      # version, which is the artifact that reaches Hackage, so that is what
+      # gets built and tested here.
+      - name: Verify the release artifact
+        if: steps.version.outputs.release == 'true'
+        run: |
+          set -euo pipefail
+
+          ./scripts/apply-version.sh "${{ steps.version.outputs.next }}"
+
+          cabal sdist
+          cabal haddock --haddock-for-hackage
+
+          mkdir sdist-build
+          tar xf dist-newstyle/sdist/*.tar.gz -C sdist-build --strip-components=1
+
+          cd sdist-build
+          cabal build all --enable-tests
+          cabal test all --test-show-details=direct
+          cabal check
+
+      # The default-branch ruleset requires a pull request, so the bump
+      # arrives as one. It carries no review: the diff it lands is the
+      # version and the changelog heading, both derived above.
+      #
+      # Authoring as github-actions[bot] keeps the commit attributed, which
+      # the ruleset's unattributed-changes rule would otherwise hold for an
+      # approval that never comes.
+      - name: Land the version bump on main
+        if: steps.version.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.next }}
+          BUMP: ${{ steps.version.outputs.bump }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+        run: |
+          set -euo pipefail
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          branch="release/v$VERSION"
+          git switch -c "$branch"
+          git commit -am "Release $VERSION
+
+          Computed a $BUMP bump from the interface diff against $PREVIOUS,
+          the last version published to Hackage."
+          git push origin "$branch"
+
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Release $VERSION" \
+            --body "Derived a \`$BUMP\` bump from the interface diff against \`$PREVIOUS\`, the last version published to Hackage. Opened and merged by \`release.yml\`; the sdist was built and tested before this landed."
+          gh pr merge "$branch" --squash --delete-branch
+
+          git fetch origin main
+          git tag "v$VERSION" origin/main
+          git push origin "v$VERSION"
+
+      - name: Publish to Hackage
+        if: steps.version.outputs.release == 'true'
+        env:
+          HACKAGE_API_KEY: ${{ secrets.HACKAGE_API_KEY }}
+        run: |
+          set -euo pipefail
+          cabal upload --publish --token="$HACKAGE_API_KEY" dist-newstyle/sdist/*.tar.gz
+          cabal upload --publish --documentation --token="$HACKAGE_API_KEY" dist-newstyle/*-docs.tar.gz
+
+      # Created last so a release only ever exists for a version Hackage
+      # actually accepted.
+      - name: Create the GitHub release
+        if: steps.version.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.next }}
+        run: |
+          set -euo pipefail
+
+          awk -v version="$VERSION" '
+            $0 ~ "^## " version "  --" { capture = 1; next }
+            capture && /^## / { exit }
+            capture { print }
+          ' ChangeLog.md >release-notes.md
+
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes-file release-notes.md \
+            dist-newstyle/sdist/*.tar.gz
