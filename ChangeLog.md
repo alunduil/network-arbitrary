@@ -11,6 +11,8 @@
 ### Changed
 
 * Test suite runs under tasty instead of hspec
+* Releases publish weekly with the PVP version computed from an interface
+  diff against the last published release
 
 ### Removed
 
