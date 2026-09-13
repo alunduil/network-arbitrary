@@ -12,23 +12,30 @@ date=${2:-$(date -u +%F)}
 cabal_file=$(ls -- *.cabal)
 
 # Only the value is replaced so cabal-fmt's column alignment survives.
-sed -i -E "s/^(version:[[:space:]]*)[^[:space:]]+/\1$version/" "$cabal_file"
+set_cabal_version() {
+  sed -i -E "s/^(version:[[:space:]]*)[^[:space:]]+/\1$version/" "$cabal_file"
+}
 
-awk -v version="$version" -v date="$date" '
-  !rolled && tolower($0) ~ /^##[[:space:]]+unreleased[[:space:]]*$/ {
-    print "## unreleased"
-    print ""
-    print "## " version "  -- " date
-    rolled = 1
-    next
-  }
-  { print }
-  END {
-    if (!rolled) {
-      print "no \"## unreleased\" heading in ChangeLog.md" > "/dev/stderr"
-      exit 1
+roll_changelog() {
+  awk -v version="$version" -v date="$date" '
+    !rolled && tolower($0) ~ /^##[[:space:]]+unreleased[[:space:]]*$/ {
+      print "## unreleased"
+      print ""
+      print "## " version "  -- " date
+      rolled = 1
+      next
     }
-  }
-' ChangeLog.md >ChangeLog.md.new
+    { print }
+    END {
+      if (!rolled) {
+        print "no \"## unreleased\" heading in ChangeLog.md" > "/dev/stderr"
+        exit 1
+      }
+    }
+  ' ChangeLog.md >ChangeLog.md.new
 
-mv ChangeLog.md.new ChangeLog.md
+  mv ChangeLog.md.new ChangeLog.md
+}
+
+set_cabal_version
+roll_changelog
