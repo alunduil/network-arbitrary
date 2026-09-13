@@ -3,8 +3,7 @@ set -euo pipefail
 
 # Writes a computed version into the cabal file and rolls the changelog's
 # "## unreleased" heading over to it. Feature branches leave both alone and
-# file their entries under "## unreleased"; the release owns the number and
-# the date.
+# file entries under that heading; the release owns the number and the date.
 
 version=${1:?usage: apply-version.sh <version> [date]}
 date=${2:-$(date -u +%F)}

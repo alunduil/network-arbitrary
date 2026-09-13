@@ -2,14 +2,12 @@
 set -euo pipefail
 
 # Derives the next PVP version from an interface diff against the last
-# version Hackage actually published. Reports and mutates nothing, so it is
-# safe to run locally to see what a release would pick.
+# version Hackage published. Mutates nothing, so it can be run locally to
+# see what a release would pick.
 #
 # Both interfaces are built in the same run, so the solver resolves the same
 # dependency versions for each and a diff means this package's own source
-# moved. That property is also why a dependency changing a type under an
-# unchanged instance head is invisible here; see "Releases and versioning"
-# in README.md for the scope decision.
+# moved. README.md's "Releases and versioning" covers what that costs.
 
 readonly HACKAGE="https://hackage.haskell.org"
 
@@ -30,7 +28,7 @@ published_version() {
     jq -er '."normal-version"[0]')
 
   # next_version addresses PVP positions by index, so a version of another
-  # shape has to stop the run rather than be bumped into nonsense.
+  # shape has to stop the run rather than be bumped at the wrong position.
   case $version in
     *.*.*.*) ;;
     *)
@@ -49,9 +47,9 @@ build_interface() {
 }
 
 # Haddock's Hoogle output is the package interface: the exposed modules and
-# the instances they define. Module qualification is stripped from instance
-# heads because it names the dependency's internal module layout, which a
-# consumer never sees and which upstream reshuffles without breaking anyone.
+# the instances they define. Module qualification comes off instance heads
+# because it names the dependency's internal module layout, which no
+# consumer sees.
 read_interface() {
   local dir=$1 hoogle
   hoogle=$(find "$dir/dist-newstyle" -path "*/doc/html/$package/$package.txt" -print -quit)
@@ -81,8 +79,8 @@ added_instance() {
 }
 
 # PVP 1: anything removed forces A.B, and so does adding an orphan instance.
-# Every instance this package defines is an orphan -- it declares no types
-# and no classes of its own -- so an added instance line is always orphan.
+# This package declares no types and no classes, so every instance it
+# defines is an orphan and an added instance line always forces A.B.
 classify_bump() {
   local added=$1 removed=$2
 
