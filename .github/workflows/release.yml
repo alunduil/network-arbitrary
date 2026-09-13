@@ -61,10 +61,12 @@ jobs:
       # gets built and tested here.
       - name: Verify the release artifact
         if: steps.version.outputs.release == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.next }}
         run: |
           set -euo pipefail
 
-          ./scripts/apply-version.sh "${{ steps.version.outputs.next }}"
+          ./scripts/apply-version.sh "$VERSION"
 
           cabal sdist
           cabal haddock --haddock-for-hackage
@@ -99,10 +101,15 @@ jobs:
 
           branch="release/v$VERSION"
           git switch -c "$branch"
-          git commit -am "Release $VERSION
+
+          # Read from stdin so the body is not indented by this block scalar.
+          git commit -a -F - <<EOF
+          Release $VERSION
 
           Computed a $BUMP bump from the interface diff against $PREVIOUS,
-          the last version published to Hackage."
+          the last version published to Hackage.
+          EOF
+
           git push origin "$branch"
 
           gh pr create \
@@ -110,6 +117,15 @@ jobs:
             --head "$branch" \
             --title "Release $VERSION" \
             --body "Derived a \`$BUMP\` bump from the interface diff against \`$PREVIOUS\`, the last version published to Hackage. Opened and merged by \`release.yml\`; the sdist was built and tested before this landed."
+
+          # GitHub computes mergeability asynchronously and reports UNKNOWN
+          # until it finishes, which a merge straight after create loses to.
+          for _ in $(seq 30); do
+            state=$(gh pr view "$branch" --json mergeable --jq .mergeable)
+            [ "$state" = UNKNOWN ] || break
+            sleep 2
+          done
+
           gh pr merge "$branch" --squash --delete-branch
 
           git fetch origin main

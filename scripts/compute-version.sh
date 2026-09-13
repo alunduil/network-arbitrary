@@ -64,11 +64,11 @@ removed=$(comm -23 <(printf '%s\n' "$previous_fingerprint") <(printf '%s\n' "$he
 # Every instance this package defines is an orphan -- it declares no types
 # and no classes of its own -- so an added instance line is always orphan.
 if [ -n "$removed" ] || printf '%s\n' "$added" | grep -q '^instance '; then
-  bump=major
+  bump="major"
 elif [ -n "$added" ]; then
-  bump=minor
+  bump="minor"
 else
-  bump=patch
+  bump="patch"
 fi
 
 IFS=. read -r a b c d <<<"$previous"
