@@ -1,3 +1,2 @@
-# Project Vale.Avoid vocabulary: terms to flag wherever they appear in
-# linted prose. One regex per line, case-sensitive (prefix (?i) for
-# case-insensitive).
+# Feeds Vale.Avoid: terms to flag wherever they appear in linted prose.
+# One regex per line, case-sensitive; prefix (?i) to relax.

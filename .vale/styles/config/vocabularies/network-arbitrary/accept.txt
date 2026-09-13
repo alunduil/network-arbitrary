@@ -1,10 +1,9 @@
-# Project Vale.Terms vocabulary: spellings to accept, and the canonical
-# casing Vale.Terms then enforces. One regex per line, case-sensitive
-# (prefix (?i) for case-insensitive). Keep this lean — add a term only
-# when it recurs in linted prose, not for one-off mentions.
+# Listing a term also fixes its casing: Vale.Terms then flags every other
+# spelling. One regex per line, case-sensitive; prefix (?i) to relax.
+# Keep this lean — add a term only when it recurs in linted prose.
 #
-# Accepted terms also become exceptions to Microsoft.Headings, which is
-# what keeps the lowercase package name in the README's title.
+# Accepted terms double as Microsoft.Headings exceptions, which is what
+# keeps the lowercase package name in the README title.
 
 Hackage
 network-arbitrary
