@@ -30,6 +30,32 @@ import Network.URI.Arbitrary ()
 main = generate (arbitrary @URI) >>= print
 ```
 
+## Releases and versioning
+
+Releases publish to Hackage weekly, and the version is computed rather than
+chosen. `scripts/compute-version.sh` diffs the interface Haddock reports for
+the working tree against the same interface from the last published release,
+then maps the result onto [PVP][pvp]:
+
+* Anything removed, or an orphan instance added, forces an `A.B` bump.
+* Additions alone give `C`.
+* An unchanged interface gives `D`.
+
+A week in which nothing the sdist carries has changed publishes nothing.
+
+This package exports no functions or types — the whole public interface is
+orphan `Arbitrary` instances — so `C` never occurs. Releases are `D` bumps
+carrying widened dependency bounds, and an added or removed instance is what
+makes one `A.B`.
+
+The diff cannot see a dependency changing a type that an instance head names.
+Both interfaces build against the same resolved dependency versions, so a diff
+means this package's own source moved. An upstream change to `MediaType` then
+reads the same on both sides and produces no diff. Two cases fall outside the
+computed version: a type renamed or removed upstream, which fails the CI matrix
+before a release, and behavior drift such as upstream widening what a type
+accepts, which PVP does not encode at any position.
+
 ## Documentation
 
 * [Hackage][hackage]: Hackage project page for network-arbitrary
@@ -52,5 +78,6 @@ main = generate (arbitrary @URI) >>= print
 [hackage]: https://hackage.haskell.org/package/network-arbitrary
 [issues]: https://github.com/alunduil/network-arbitrary/issues
 [network-category]: https://hackage.haskell.org/packages/#cat:Network
+[pvp]: https://pvp.haskell.org/
 [pull requests]: https://github.com/alunduil/network-arbitrary/pulls
 [quickcheck]: https://hackage.haskell.org/package/QuickCheck
