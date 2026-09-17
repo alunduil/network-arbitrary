@@ -15,7 +15,7 @@ You can use network-arbitrary to provide Arbitrary instances for Network module 
 
 ## Terms of use
 
-You are free to use network-arbitrary without any conditions.  See the [LICENSE]
+You are free to use network-arbitrary without any conditions. See the [LICENSE]
 file for details.
 
 ## How to use network-arbitrary
@@ -65,11 +65,11 @@ accepts, which PVP does not encode at any position.
 * [Hackage's Network Category][network-category]: Hackage's Network category
 * [QuickCheck][quickcheck]: QuickCheck's documentation
 
-## Getting Help
+## Getting help
 
 * [GitHub Issues][issues]: Support requests, bug reports, and feature requests
 
-## How to Help
+## How to help
 
 * Submit [issues] for problems or questions
 * Submit [pull requests] for proposed changes
