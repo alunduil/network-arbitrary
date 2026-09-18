@@ -43,18 +43,18 @@ then maps the result onto [PVP][pvp]:
 
 A week in which nothing the sdist carries has changed publishes nothing.
 
-This package exports no functions or types — the whole public interface is
-orphan `Arbitrary` instances — so `C` never occurs. Releases are `D` bumps
+This package exports no functions or types—the whole public interface is
+orphan `Arbitrary` instances—so `C` never occurs. Releases are `D` bumps
 carrying widened dependency bounds, and an added or removed instance is what
 makes one `A.B`.
 
-The diff cannot see a dependency changing a type that an instance head names.
+The diff can't see a dependency changing a type that an instance head names.
 Both interfaces build against the same resolved dependency versions, so a diff
 means this package's own source moved. An upstream change to `MediaType` then
 reads the same on both sides and produces no diff. Two cases fall outside the
 computed version: a type renamed or removed upstream, which fails the CI matrix
 before a release, and behavior drift such as upstream widening what a type
-accepts, which PVP does not encode at any position.
+accepts, which PVP doesn't encode at any position.
 
 ## Documentation
 
