@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
-    - uses: haskell-actions/setup@6037f33647c3f17758a2356c80fc4a53d7e0685d # v2
+    - uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2
       with:
         ghc-version: '9.4.7'
     - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
