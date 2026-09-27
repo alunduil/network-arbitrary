@@ -10,27 +10,9 @@
   "labels": ["dependencies"],
   "pre-commit": { "enabled": true },
   "minimumReleaseAge": "3 days",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
   "osvVulnerabilityAlerts": true,
   "packageRules": [
-    {
-      "description": "These update types carry no release timestamp, so minimumReleaseAge treats them as never stable and cuts no branch. Deleting this rule silently disables digest pinning and lock file maintenance.",
-      "matchUpdateTypes": [
-        "pin",
-        "pinDigest",
-        "digest",
-        "lockFileMaintenance",
-        "lockfileUpdate",
-        "rollback",
-        "bump",
-        "replacement"
-      ],
-      "minimumReleaseAge": null
-    },
-    {
-      "description": "The Hackage datasource reports no release timestamps, so the default timestamp-required behaviour parks every Hackage update on a pending status check indefinitely.",
-      "matchDatasources": ["hackage"],
-      "minimumReleaseAgeBehaviour": "timestamp-optional"
-    },
     {
       "matchUpdateTypes": ["patch"],
       "automerge": true
