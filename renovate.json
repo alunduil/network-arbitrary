@@ -27,6 +27,11 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "Hackage publishes no release timestamps, so without this rule minimumReleaseAge holds every Hackage update as pending and no PR opens.",
+      "matchDatasources": ["hackage"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
       "matchUpdateTypes": ["patch"],
       "automerge": true
     },
