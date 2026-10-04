@@ -25,6 +25,9 @@ jobs:
       # pull request costs nothing at this repo's size.
       issues: write
       pull-requests: write
+    env:
+      STALE_DAYS: 30
+      CLOSE_DAYS: 14
     steps:
       # Disabling only the marking leg would leave an issue that already
       # carries the label eligible for closing.
@@ -32,17 +35,19 @@ jobs:
         with:
           days-before-issue-stale: -1
           days-before-issue-close: -1
-          days-before-pr-stale: 30
-          days-before-pr-close: 14
+          days-before-pr-stale: ${{ env.STALE_DAYS }}
+          days-before-pr-close: ${{ env.CLOSE_DAYS }}
           # Closing a Renovate pull request tells Renovate the version is
           # unwanted and it will not re-offer it. Renovate labels nothing by
           # default, so this depends on renovate.json applying the label.
           exempt-pr-labels: dependencies
           stale-pr-message: >-
-            This has been quiet for 30 days, so it's picked up a stale label. A
-            comment or a push clears the label and restarts the clock. Otherwise
-            this closes in another 14 days.
+            This has been quiet for ${{ env.STALE_DAYS }} days, so it's picked
+            up a stale label. A comment or a push clears the label and restarts
+            the clock. Otherwise this closes in another ${{ env.CLOSE_DAYS }}
+            days.
           close-pr-message: >-
-            Closing this after another 14 quiet days. That isn't a call on the
-            change itself, and nothing is lost: the branch stays where it is, so
-            comment here if you want to pick it back up and I'll reopen it.
+            Closing this after another ${{ env.CLOSE_DAYS }} quiet days. That
+            isn't a call on the change itself, and nothing is lost: the branch
+            stays where it is, so comment here if you want to pick it back up
+            and I'll reopen it.
