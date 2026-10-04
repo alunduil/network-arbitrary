@@ -1,0 +1,9 @@
+# Listing a term also fixes its casing: Vale.Terms then flags every other
+# spelling. One regex per line, case-sensitive; prefix (?i) to relax.
+# Keep this lean — add a term only when it recurs in linted prose.
+#
+# Accepted terms double as Microsoft.Headings exceptions, which is what
+# keeps the lowercase package name in the README title.
+
+Hackage
+network-arbitrary
