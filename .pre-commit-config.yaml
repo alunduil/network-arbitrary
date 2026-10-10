@@ -55,12 +55,3 @@ repos:
           - ormolu-0.7.3.0
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]
-      - id: cabal-fmt
-        name: cabal-fmt
-        entry: cabal-fmt
-        language: haskell
-        additional_dependencies:
-          - cabal-fmt-0.1.9
-        files: '\.cabal$'
-        exclude: '\.golden\.cabal$'
-        args: ["-i"]

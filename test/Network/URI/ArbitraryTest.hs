@@ -25,7 +25,9 @@ import Test.Tasty
     testGroup,
   )
 import Test.Tasty.QuickCheck
-  ( testProperty,
+  ( mapSize,
+    shrink,
+    testProperty,
   )
 
 -- id keeps the password that URI's Show instance would hide, which
@@ -33,14 +35,22 @@ import Test.Tasty.QuickCheck
 render :: URI -> String
 render u = uriToString id u ""
 
+roundTrips :: URI -> Bool
+roundTrips = parseURIReference . render <=> Just
+
+-- Keeps the shrink property fast: a full-size URI yields thousands of
+-- shrink candidates.
+shrinkSize :: Int
+shrinkSize = 10
+
 tests :: TestTree
 tests =
   testGroup
     "Network.URI.Arbitrary"
     [ testProperty "isURIReference . render" $
         isURIReference . render,
-      testProperty "parseURIReference . render <=> Just" $
-        parseURIReference
-          . render
-          <=> Just
+      testProperty "roundTrips" roundTrips,
+      testProperty "all roundTrips . shrink" $
+        mapSize (min shrinkSize) $
+          all roundTrips . shrink
     ]
