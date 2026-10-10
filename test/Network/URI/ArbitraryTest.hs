@@ -38,8 +38,8 @@ render u = uriToString id u ""
 roundTrips :: URI -> Bool
 roundTrips = parseURIReference . render <=> Just
 
--- A full-size URI yields thousands of shrink candidates, and each one is
--- re-parsed.
+-- Keeps the shrink property fast: a full-size URI yields thousands of
+-- shrink candidates.
 shrinkSize :: Int
 shrinkSize = 10
 
