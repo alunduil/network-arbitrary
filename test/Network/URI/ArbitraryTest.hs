@@ -35,17 +35,22 @@ import Test.Tasty.QuickCheck
 render :: URI -> String
 render u = uriToString id u ""
 
+roundTrips :: URI -> Bool
+roundTrips = parseURIReference . render <=> Just
+
+-- A full-size URI yields thousands of shrink candidates, and each one is
+-- re-parsed.
+shrinkSize :: Int
+shrinkSize = 10
+
 tests :: TestTree
 tests =
   testGroup
     "Network.URI.Arbitrary"
     [ testProperty "isURIReference . render" $
         isURIReference . render,
-      testProperty "parseURIReference . render <=> Just" $
-        parseURIReference
-          . render
-          <=> Just,
-      testProperty "all (parseURIReference . render <=> Just) . shrink" $
-        mapSize (min 10) $
-          all (parseURIReference . render <=> Just) . shrink
+      testProperty "roundTrips" roundTrips,
+      testProperty "all roundTrips . shrink" $
+        mapSize (min shrinkSize) $
+          all roundTrips . shrink
     ]
