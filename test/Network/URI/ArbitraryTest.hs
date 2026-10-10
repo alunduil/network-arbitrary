@@ -25,7 +25,9 @@ import Test.Tasty
     testGroup,
   )
 import Test.Tasty.QuickCheck
-  ( testProperty,
+  ( mapSize,
+    shrink,
+    testProperty,
   )
 
 -- id keeps the password that URI's Show instance would hide, which
@@ -42,5 +44,8 @@ tests =
       testProperty "parseURIReference . render <=> Just" $
         parseURIReference
           . render
-          <=> Just
+          <=> Just,
+      testProperty "all (parseURIReference . render <=> Just) . shrink" $
+        mapSize (min 10) $
+          all (parseURIReference . render <=> Just) . shrink
     ]
