@@ -1,7 +1,8 @@
 root = true
 
-# The pre-commit hooks enforce these same rules on commit. Change both
-# sides together, or the hooks overwrite what the editor produced.
+# trim_trailing_whitespace and insert_final_newline mirror the
+# trailing-whitespace and end-of-file-fixer pre-commit hooks. Change
+# them together, or the hooks undo the editor's output on commit.
 [*]
 charset = utf-8
 end_of_line = lf
