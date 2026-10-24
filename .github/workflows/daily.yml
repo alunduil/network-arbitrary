@@ -6,13 +6,17 @@ on:
     - cron: '47 6 * * *'
       timezone: Europe/London
   workflow_dispatch:
+  # Dry run, so a pull request changing this file shows whether it still works.
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
 
 concurrency:
-  # Two sweeps in flight would both comment on the same pull request.
-  group: ${{ github.workflow }}
+  # Two sweeps in flight would both comment on the same pull request. Dry runs
+  # write nothing, so each pull request gets its own group.
+  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow, github.ref) || github.workflow }}
 
 jobs:
   stale-pull-requests:
@@ -30,6 +34,7 @@ jobs:
     steps:
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
+          debug-only: ${{ github.event_name == 'pull_request' }}
           # Disabling only marking would still close issues already labelled.
           days-before-issue-stale: -1
           days-before-issue-close: -1

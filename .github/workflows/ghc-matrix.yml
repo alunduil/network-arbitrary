@@ -5,13 +5,17 @@ on:
   schedule:
     - cron: "0 18 * * 5"
       timezone: "Europe/London"
+  # Detects drift but files nothing, so a pull request changing this file
+  # shows whether it still works.
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
   issues: write
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow, github.ref) || github.workflow }}
   cancel-in-progress: false
 
 jobs:
@@ -91,7 +95,9 @@ jobs:
       # update_existing matches on title, so the fixed title above keeps
       # every drift run on one issue instead of filing duplicates.
       - name: File or refresh drift issue
-        if: steps.check.outputs.drift == 'true'
+        if: >-
+          steps.check.outputs.drift == 'true'
+          && github.event_name != 'pull_request'
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
