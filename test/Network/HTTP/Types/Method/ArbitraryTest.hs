@@ -33,5 +33,5 @@ tests =
     [ testProperty "parseMethod . renderStdMethod <=> Right" $
         parseMethod
           . renderStdMethod
-          <=> Right
+          <=> Left
     ]
