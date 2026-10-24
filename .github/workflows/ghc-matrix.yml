@@ -12,7 +12,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   # The number is empty outside pull requests, so scheduled runs share one
@@ -25,6 +24,9 @@ jobs:
     name: Check GHC matrix drift
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      drift: ${{ steps.check.outputs.drift }}
+      issue: ${{ steps.check.outputs.issue }}
 
     steps:
       - name: Checkout
@@ -94,12 +96,33 @@ jobs:
           (CI/packaging-only is a patch).
           EOF
 
+          delimiter=$(openssl rand -hex 16)
+          {
+            echo "issue<<$delimiter"
+            cat ghc-drift-issue.md
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+  file-drift-issue:
+    name: File GHC matrix drift issue
+    needs: drift
+    if: >-
+      needs.drift.outputs.drift == 'true'
+      && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      issues: write
+
+    steps:
+      - name: Write drift issue
+        env:
+          ISSUE: ${{ needs.drift.outputs.issue }}
+        run: printf '%s\n' "$ISSUE" > ghc-drift-issue.md
+
       # update_existing matches on title, so the fixed title above keeps
       # every drift run on one issue instead of filing duplicates.
       - name: File or refresh drift issue
-        if: >-
-          steps.check.outputs.drift == 'true'
-          && github.event_name != 'pull_request'
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
