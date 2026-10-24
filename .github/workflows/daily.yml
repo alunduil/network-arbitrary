@@ -15,8 +15,9 @@ permissions:
 
 concurrency:
   # Two sweeps in flight would both comment on the same pull request. Dry runs
-  # write nothing, so each pull request gets its own group.
-  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow, github.ref) || github.workflow }}
+  # write nothing, so each pull request gets its own group; the number is
+  # empty outside pull requests, which puts every sweep in one group.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
 
 jobs:
   stale-pull-requests:

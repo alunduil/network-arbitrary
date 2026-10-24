@@ -15,7 +15,9 @@ permissions:
   issues: write
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow, github.ref) || github.workflow }}
+  # The number is empty outside pull requests, so scheduled runs share one
+  # group and each pull request gets its own.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
