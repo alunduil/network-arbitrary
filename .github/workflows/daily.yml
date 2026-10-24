@@ -6,7 +6,8 @@ on:
     - cron: '47 6 * * *'
       timezone: Europe/London
   workflow_dispatch:
-  # Dry run, so a pull request changing this file shows whether it still works.
+  # Pull requests dry-run the sweep to test changes to this workflow before
+  # merge. No paths filter: a required check must report on every pull request.
   pull_request:
     branches: [main]
 
@@ -14,9 +15,9 @@ permissions:
   contents: read
 
 concurrency:
-  # Two sweeps in flight would both comment on the same pull request. Dry runs
-  # write nothing, so each pull request gets its own group; the number is
-  # empty outside pull requests, which puts every sweep in one group.
+  # Two sweeps in flight would both comment on the same pull request. Each pull
+  # request gets its own group so its dry run never waits on the sweep or
+  # cancels another pull request's. Outside pull requests the number is empty.
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
 
 jobs:
