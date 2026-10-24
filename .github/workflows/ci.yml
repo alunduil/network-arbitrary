@@ -22,7 +22,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # GHC can't link on macos-26:
+        # https://github.com/actions/runner-images/issues/14940
+        os: [ubuntu-latest, macos-15]
         ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
 
     steps:
