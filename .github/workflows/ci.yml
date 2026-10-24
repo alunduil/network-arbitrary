@@ -143,9 +143,9 @@ jobs:
           files: ${{ steps.report.outputs.report }}
           fail_ci_if_error: true
 
-  # The stable check name the default-branch ruleset pins: renaming this job
-  # breaks the merge gate. Requiring the matrix legs directly would block
-  # merges once a GHC version ages out and its check stops reporting.
+  # Rulesets require this check by name, so renaming the job breaks the merge
+  # gate. It reports every gating job under one name because the build's
+  # per-cell check names change with the GHC matrix.
   results:
     name: Check CI results
     runs-on: ubuntu-latest
