@@ -1,4 +1,4 @@
-name: GHC matrix
+name: Weekly
 
 on:
   workflow_dispatch:
