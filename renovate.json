@@ -36,7 +36,7 @@
       "automerge": true
     },
     {
-      "description": "A runner image ships nothing to Hackage consumers, and every job on a versioned runner is a required check, so a broken image holds the merge. Majors included.",
+      "description": "Majors too: a runner image ships nothing to Hackage consumers. Safe only while every job on a versioned runner is a required check, which holds a broken image's merge.",
       "matchDatasources": ["github-runners"],
       "automerge": true
     },
