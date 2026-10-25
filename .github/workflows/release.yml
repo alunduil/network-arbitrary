@@ -1,4 +1,4 @@
-name: Publish to Hackage
+name: Release
 
 on:
   release:
@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   publish:
+    name: Publish to Hackage
     runs-on: ubuntu-latest
     environment: hackage
     steps:
