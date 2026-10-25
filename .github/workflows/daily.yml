@@ -23,7 +23,7 @@ concurrency:
 jobs:
   stale-pull-requests:
     name: Prune stale pull requests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       # Without `actions`, a sweep cut off at operations-per-run restarts from
