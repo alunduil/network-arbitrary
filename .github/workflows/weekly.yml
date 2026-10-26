@@ -23,7 +23,7 @@ concurrency:
 jobs:
   drift:
     name: Check GHC matrix drift
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     outputs:
       drift: ${{ steps.check.outputs.drift }}
@@ -112,7 +112,7 @@ jobs:
     if: >-
       needs.drift.outputs.drift == 'true'
       && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       issues: write
