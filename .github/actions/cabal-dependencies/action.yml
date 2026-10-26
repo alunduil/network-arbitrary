@@ -1,0 +1,48 @@
+name: Install cabal dependencies
+description: >-
+  Build a configured project's dependencies, restoring and saving the cabal
+  store under a key that tracks the build plan.
+
+inputs:
+  working-directory:
+    description: Directory holding the configured cabal project.
+    default: .
+  ghc-version:
+    description: The ghc-version output of haskell-actions/setup.
+    required: true
+  cabal-version:
+    description: The cabal-version output of haskell-actions/setup.
+    required: true
+  cabal-store:
+    description: The cabal-store output of haskell-actions/setup.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Generate build plan
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: cabal build all --dry-run
+
+    - name: Restore cabal store
+      id: cache
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      env:
+        key: ${{ runner.os }}-ghc-${{ inputs.ghc-version }}-cabal-${{ inputs.cabal-version }}
+      with:
+        path: ${{ inputs.cabal-store }}
+        key: ${{ env.key }}-plan-${{ hashFiles(format('{0}/dist-newstyle/cache/plan.json', inputs.working-directory)) }}
+        restore-keys: ${{ env.key }}-
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: cabal build all --only-dependencies
+
+    - name: Save cabal store
+      if: steps.cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ inputs.cabal-store }}
+        key: ${{ steps.cache.outputs.cache-primary-key }}
