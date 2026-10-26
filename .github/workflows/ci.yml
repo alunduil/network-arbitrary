@@ -26,6 +26,12 @@ jobs:
         # https://github.com/actions/runner-images/issues/14940
         os: [ubuntu-latest, macos-15]
         ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
+        include:
+          # Metadata and docs don't vary by GHC or OS, and haddock is slow:
+          # it rebuilds every dependency with documentation.
+          - os: ubuntu-latest
+            ghc: "9.14"
+            package-checks: true
 
     steps:
       - name: Checkout
@@ -88,10 +94,12 @@ jobs:
         run: cabal test all --test-show-details=direct
 
       - name: Check package metadata
+        if: matrix.package-checks
         working-directory: sdist-build
         run: cabal check
 
       - name: Haddock
+        if: matrix.package-checks
         working-directory: sdist-build
         run: cabal haddock all
 
@@ -110,6 +118,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up GHC
+        id: setup
         uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
         with:
           ghc-version: "9.14"
@@ -120,8 +129,34 @@ jobs:
 
       # Builds from the working tree, not the sdist: each .mix file
       # records its source path, and Codecov reports against src/.
+      - name: Configure with coverage
+        run: cabal configure --enable-tests --enable-coverage
+
+      - name: Generate build plan
+        run: cabal build all --dry-run
+
+      - name: Restore cabal store
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        env:
+          key: ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}
+        with:
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: ${{ env.key }}-plan-${{ hashFiles('dist-newstyle/cache/plan.json') }}
+          restore-keys: ${{ env.key }}-
+
+      - name: Install dependencies
+        run: cabal build all --only-dependencies
+
+      - name: Save cabal store
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
       - name: Test with coverage
-        run: cabal test all --enable-coverage --test-show-details=direct
+        run: cabal test all --test-show-details=direct
 
       # A new *Test module has to be listed here too, or it counts
       # toward library coverage. hpc-codecov matches literal names.
