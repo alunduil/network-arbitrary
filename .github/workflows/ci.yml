@@ -98,9 +98,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    # The step condition below reads this rather than secrets directly,
-    # which the steps context cannot see.
     env:
+      # The step condition below reads this rather than secrets directly,
+      # which the steps context cannot see.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
       GHC_VERSION: "9.14.1"
