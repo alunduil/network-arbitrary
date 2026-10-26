@@ -16,19 +16,25 @@ concurrency:
 jobs:
   build:
     name: GHC ${{ matrix.ghc }} / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-${{ matrix.OS_VERSION }}
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        # GHC can't link on macos-26:
-        # https://github.com/actions/runner-images/issues/14940
-        os: [ubuntu-latest, macos-15]
+        os: [ubuntu, macos]
         ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
         include:
+          - os: ubuntu
+            # renovate: datasource=github-runners depName=ubuntu
+            OS_VERSION: "26.04"
+          - os: macos
+            # GHC can't link on macos-26:
+            # https://github.com/actions/runner-images/issues/14940
+            # renovate: datasource=github-runners depName=macos
+            OS_VERSION: "15"
           # Package metadata and docs don't vary by GHC or OS.
-          - os: ubuntu-latest
+          - os: ubuntu
             ghc: "9.14"
             package-checks: true
 
@@ -91,7 +97,7 @@ jobs:
 
   coverage:
     name: Coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     # The step condition below reads this rather than secrets directly,
@@ -150,7 +156,7 @@ jobs:
 
   pre-commit:
     name: Run pre-commit hooks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     env:
@@ -186,7 +192,7 @@ jobs:
   dependency-review:
     name: Review dependencies
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     steps:
@@ -201,7 +207,7 @@ jobs:
   # per-cell check names change with the GHC matrix.
   results:
     name: Check CI results
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     needs: [build, coverage, pre-commit, dependency-review]
     if: always()
