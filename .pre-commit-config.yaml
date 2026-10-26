@@ -32,9 +32,8 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
-  # Renovate's pre-commit manager tracks only hooks with a `rev:`, so these
-  # tools' versions are pinned in the pre-commit job of
-  # `.github/workflows/ci.yml`.
+  # Versions are pinned in the pre-commit job of `.github/workflows/ci.yml`;
+  # Renovate's pre-commit manager tracks only hooks with a `rev:`.
   - repo: local
     hooks:
       - id: hlint

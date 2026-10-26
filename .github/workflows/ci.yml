@@ -149,9 +149,9 @@ jobs:
     timeout-minutes: 10
 
     env:
-      # Both tools version with PVP, whose four-component releases the default
-      # semver-coerced versioning reports as unstable — `ignoreUnstable` then
-      # hides every update. `loose` compares them component-wise instead.
+      # `versioning=loose`: the default semver coercion reads PVP's
+      # four-component versions as unstable, and `ignoreUnstable` then hides
+      # every update.
       # renovate: datasource=github-releases depName=ndmitchell/hlint versioning=loose extractVersion=^v(?<version>.+)$
       HLINT_VERSION: "3.10"
       # renovate: datasource=github-releases depName=tweag/ormolu versioning=loose
