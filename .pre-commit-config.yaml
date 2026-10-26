@@ -32,14 +32,14 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
+  # Versions are pinned in the pre-commit job of `.github/workflows/ci.yml`;
+  # Renovate's pre-commit manager tracks only hooks with a `rev:`.
   - repo: local
     hooks:
       - id: hlint
         name: hlint
         entry: hlint
-        language: haskell
-        additional_dependencies:
-          - hlint-3.6.1
+        language: system
         types_or: ["haskell", "literate-haskell"]
       - id: cabal check
         name: cabal check
@@ -50,8 +50,6 @@ repos:
       - id: ormolu
         name: ormolu
         entry: ormolu
-        language: haskell
-        additional_dependencies:
-          - ormolu-0.7.3.0
+        language: system
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]

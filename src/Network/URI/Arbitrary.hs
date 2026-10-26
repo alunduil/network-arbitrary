@@ -52,9 +52,9 @@ instance Arbitrary URI where
     filter
       isURI
       [ URI uriScheme' uriAuthority' uriPath' uriQuery' uriFragment'
-        | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <-
-            shrink
-              (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
+      | (uriScheme', uriAuthority', uriPath', uriQuery', uriFragment') <-
+          shrink
+            (uriScheme, uriAuthority, uriPath, uriQuery, uriFragment)
       ]
     where
       isURI u = case parseURIReference (uriToString id u "") of
@@ -66,9 +66,9 @@ instance Arbitrary URIAuth where
 
   shrink URIAuth {..} =
     [ URIAuth uriUserInfo' uriRegName' uriPort'
-      | (uriUserInfo', uriRegName', uriPort') <-
-          shrink
-            (uriUserInfo, uriRegName, uriPort)
+    | (uriUserInfo', uriRegName', uriPort') <-
+        shrink
+          (uriUserInfo, uriRegName, uriPort)
     ]
 
 -- * RFC 3986 Generators
@@ -150,10 +150,10 @@ decOctet = (show :: Int -> String) <$> choose (0, 255)
 
 regName :: Gen String
 regName =
-  fmap concat $
-    listOf $
-      oneof
-        [replicateM 1 unreserved, percentEncoded, replicateM 1 subDelims]
+  fmap concat
+    $ listOf
+    $ oneof
+      [replicateM 1 unreserved, percentEncoded, replicateM 1 subDelims]
 
 path :: Bool -> Bool -> Gen String
 path emptyScheme emptyURIAuth =

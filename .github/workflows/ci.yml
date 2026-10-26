@@ -146,21 +146,34 @@ jobs:
   pre-commit:
     name: Run pre-commit hooks
     runs-on: ubuntu-latest
-    # Sized for a cold cache, which rebuilds the Haskell hook environments.
-    timeout-minutes: 45
+    timeout-minutes: 10
+
+    env:
+      # `versioning=loose`: the default semver coercion reads PVP's
+      # four-component versions as unstable, and `ignoreUnstable` then hides
+      # every update.
+      # renovate: datasource=github-releases depName=ndmitchell/hlint versioning=loose extractVersion=^v(?<version>.+)$
+      HLINT_VERSION: "3.10"
+      # renovate: datasource=github-releases depName=tweag/ormolu versioning=loose
+      ORMOLU_VERSION: "0.9.0.0"
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-
-      # The hlint hook's hlint-3.6.1 needs base <4.19, so GHC 9.6 at most.
-      - name: Set up GHC
-        uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
+      - name: Set up HLint
+        uses: haskell-actions/hlint-setup@fe9cd1cd1af94a23900c06738e73f6ddb092966a # v2
         with:
-          ghc-version: "9.4.7"
+          version: ${{ env.HLINT_VERSION }}
+
+      - name: Install Ormolu
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL -o /tmp/ormolu.zip \
+            "https://github.com/tweag/ormolu/releases/download/${ORMOLU_VERSION}/ormolu-x86_64-linux.zip"
+          unzip -j /tmp/ormolu.zip ormolu -d "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/ormolu"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run pre-commit hooks
         uses: tox-dev/action-pre-commit-uv@4de52c139ed1a6963bcc4c30042c4ef9d75d8b11 # v1.1.0

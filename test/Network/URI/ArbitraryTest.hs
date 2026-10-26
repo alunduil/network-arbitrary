@@ -50,7 +50,7 @@ tests =
     [ testProperty "isURIReference . render" $
         isURIReference . render,
       testProperty "roundTrips" roundTrips,
-      testProperty "all roundTrips . shrink" $
-        mapSize (min shrinkSize) $
-          all roundTrips . shrink
+      testProperty "all roundTrips . shrink"
+        $ mapSize (min shrinkSize)
+        $ all roundTrips . shrink
     ]
