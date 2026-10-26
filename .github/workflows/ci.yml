@@ -27,8 +27,7 @@ jobs:
         os: [ubuntu-latest, macos-15]
         ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
         include:
-          # Metadata and docs don't vary by GHC or OS, and haddock is slow:
-          # it rebuilds every dependency with documentation.
+          # Package metadata and docs don't vary by GHC or OS.
           - os: ubuntu-latest
             ghc: "9.14"
             package-checks: true
