@@ -1,9 +1,6 @@
 name: Set up GHC
 description: Install GHC and cabal-install with haskell-actions/setup, restoring both from the Actions cache.
 
-# setup reports the exact GHC release only after installing it, so a key
-# built from a series would restore the previous patch release after a
-# new one ships.
 inputs:
   ghc-version:
     description: A GHC major series such as 9.12, or an exact release.
@@ -23,6 +20,9 @@ outputs:
 runs:
   using: composite
   steps:
+    # setup reports the exact GHC release only after installing it, so a
+    # key built from a series would restore the previous patch release
+    # after a new one ships.
     - name: Resolve GHC release
       id: resolve
       shell: bash
