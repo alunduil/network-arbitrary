@@ -47,9 +47,6 @@ runs:
           printf '%s\n' "${paths[@]}"
           echo "EOF"
         } >> "$GITHUB_OUTPUT"
-        # setup counts a restored toolchain as installed only if this
-        # directory exists, and restoring doesn't create it.
-        mkdir -p "$HOME/.ghcup/bin"
 
     - name: Restore toolchain
       id: cache
@@ -57,6 +54,12 @@ runs:
       with:
         path: ${{ steps.resolve.outputs.paths }}
         key: ${{ steps.resolve.outputs.key }}
+
+    # setup counts a restored toolchain as installed only if this
+    # directory exists, and restoring doesn't create it.
+    - name: Prepare ghcup
+      shell: bash
+      run: mkdir -p "$HOME/.ghcup/bin"
 
     - name: Install toolchain
       id: setup
