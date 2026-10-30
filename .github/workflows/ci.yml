@@ -173,8 +173,6 @@ jobs:
       HLINT_VERSION: "3.10"
       # renovate: datasource=github-releases depName=tweag/ormolu versioning=loose
       ORMOLU_VERSION: "0.9.0.0"
-      # renovate: datasource=github-releases depName=j178/prek extractVersion=^v(?<version>.+)$
-      PREK_VERSION: "0.5.7"
 
     steps:
       - name: Checkout
@@ -197,7 +195,7 @@ jobs:
       - name: Run pre-commit hooks
         uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
         with:
-          prek-version: ${{ env.PREK_VERSION }}
+          prek-version: "0.5.7"
 
   dependency-review:
     name: Review dependencies
