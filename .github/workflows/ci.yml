@@ -150,8 +150,7 @@ jobs:
           excludes: Main,Network.HTTP.Media.MediaType.ArbitraryTest,Network.HTTP.Types.Method.ArbitraryTest,Network.URI.ArbitraryTest
 
       # Pull requests from forks get no secrets, so skip the upload
-      # rather than failing them on it. Errors uploading with a token
-      # in hand still fail the job.
+      # rather than failing them on it.
       - name: Upload to Codecov
         if: env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
