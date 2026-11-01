@@ -32,8 +32,7 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
-  # hlint and ormolu versions are pinned in `mise.toml`; Renovate's
-  # pre-commit manager tracks only hooks with a `rev:`.
+  # `mise install` puts hlint and ormolu on PATH at the versions CI runs.
   - repo: local
     hooks:
       - id: hlint
