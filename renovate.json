@@ -12,6 +12,13 @@
       "automerge": true
     },
     {
+      "description": "Default versioning never offers four-component PVP versions, and hlint's release tags carry a v that mise.toml omits.",
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["ndmitchell/hlint", "tweag/ormolu"],
+      "versioning": "loose",
+      "extractVersion": "^v?(?<version>.+)$"
+    },
+    {
       "description": "tasty-quickcheck bounds both tasty and QuickCheck, so bumping one alone can open a PR that fails to resolve.",
       "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
