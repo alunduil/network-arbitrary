@@ -5,12 +5,15 @@ mise install
 
 # GHC and cabal stay off mise, so the versions CI pins in its workflow
 # env are the ones to match.
-pin() {
-  sed -n "s/^ *$1: \"\(.*\)\"$/\1/p" .github/workflows/ci.yml | head -n 1
+ci_version() {
+  local version
+  version=$(sed -n "s/^ *$1: \"\(.*\)\"$/\1/p" .github/workflows/ci.yml | head -n 1)
+  echo "${version:?$1 not found in ci.yml}"
 }
-ghc=$(pin GHC_VERSION)
-cabal=$(pin CABAL_VERSION)
+# Assignments, not inline substitutions, so set -e stops on a missing pin.
+ghc=$(ci_version GHC_VERSION)
+cabal=$(ci_version CABAL_VERSION)
 
-ghcup install ghc "${ghc:?GHC_VERSION not found in ci.yml}" --set
-ghcup install cabal "${cabal:?CABAL_VERSION not found in ci.yml}" --set
+ghcup install ghc "$ghc" --set
+ghcup install cabal "$cabal" --set
 cabal update
