@@ -12,6 +12,7 @@
       "automerge": true
     },
     {
+      "description": "tasty-quickcheck bounds the QuickCheck and tasty versions it builds against, so bumping one alone can open a PR that fails to resolve.",
       "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
     }
