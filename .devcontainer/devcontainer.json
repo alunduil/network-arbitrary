@@ -1,0 +1,15 @@
+{
+  "name": "network-arbitrary",
+  "image": "mcr.microsoft.com/devcontainers/base:3.0.12-ubuntu26.04@sha256:b1e3b08610ae0b2599f57c3a492eebc93d1d26dbaefb4a0bad0caa7149e4ec95",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
+  "containerEnv": {
+    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
+  },
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "PATH": "/home/vscode/.ghcup/bin:/home/vscode/.local/share/mise/shims:${containerEnv:PATH}"
+  },
+  "postCreateCommand": ".devcontainer/post-create.sh"
+}
