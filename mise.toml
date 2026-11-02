@@ -6,6 +6,6 @@ lockfile_platforms = ["linux-x64"]
 [tools]
 "github:ndmitchell/hlint" = "3.10"
 "github:tweag/ormolu" = "0.9.0.0"
-prek = "0.5.7"
+prek = "0.5.9"
 # GHC and cabal stay off mise; the devcontainer installs them with ghcup.
 ghcup = "0.2.6.2"
