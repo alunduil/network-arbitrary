@@ -22,7 +22,7 @@ cabal_field() {
 }
 
 published_version() {
-  local version
+  local package=$1 version
   version=$(curl -fsSL -H 'Accept: application/json' \
     "$HACKAGE/package/$package/preferred" |
     jq -er '."normal-version"[0]')
@@ -51,7 +51,7 @@ build_interface() {
 # because it names the dependency's internal module layout, which no
 # consumer sees.
 read_interface() {
-  local dir=$1 hoogle
+  local dir=$1 package=$2 hoogle
   hoogle=$(find "$dir/dist-newstyle" -path "*/doc/html/$package/$package.txt" -print -quit)
 
   if [ -z "$hoogle" ]; then
@@ -68,10 +68,10 @@ read_interface() {
 # reliably excludes the current compiler. Only its interface is wanted and
 # the build never ships, so relaxing its bounds is enough.
 published_interface() {
-  local parent=$1 unpacked="$1/$package-$published"
+  local parent=$1 package=$2 published=$3 unpacked="$1/$2-$3"
   (cd "$parent" && cabal get "$package-$published" >/dev/null)
   build_interface "$unpacked" --allow-newer
-  read_interface "$unpacked"
+  read_interface "$unpacked" "$package"
 }
 
 added_instance() {
@@ -106,7 +106,7 @@ next_version() {
 
 # Releases before 1.0.0.0 were tagged without the v prefix.
 published_tag() {
-  local candidate
+  local published=$1 candidate
   for candidate in "v$published" "$published"; do
     if git rev-parse -q --verify "refs/tags/$candidate" >/dev/null 2>&1; then
       printf '%s\n' "$candidate"
@@ -117,8 +117,8 @@ published_tag() {
 }
 
 has_releasable_changes() {
-  local tag
-  if ! tag=$(published_tag); then
+  local published=$1 tag
+  if ! tag=$(published_tag "$published"); then
     echo "no tag for published version $published; treating HEAD as releasable" >&2
     return 0
   fi
@@ -152,34 +152,41 @@ emit() {
   [ -z "${GITHUB_OUTPUT:-}" ] || printf '%s=%s\n' "$1" "$2" >>"$GITHUB_OUTPUT"
 }
 
-package=$(cabal_field name)
-declared=$(cabal_field version)
-published=$(published_version)
+main() {
+  local package declared published
+  package=$(cabal_field name)
+  declared=$(cabal_field version)
+  published=$(published_version "$package")
 
-workdir=$(mktemp -d)
-trap 'rm -rf "$workdir"' EXIT
+  workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
 
-build_interface .
-head_interface=$(read_interface .)
-previous_interface=$(published_interface "$workdir")
+  local head_interface previous_interface
+  build_interface .
+  head_interface=$(read_interface . "$package")
+  previous_interface=$(published_interface "$workdir" "$package" "$published")
 
-added=$(comm -13 <(printf '%s\n' "$previous_interface") <(printf '%s\n' "$head_interface"))
-removed=$(comm -23 <(printf '%s\n' "$previous_interface") <(printf '%s\n' "$head_interface"))
+  local added removed bump next release
+  added=$(comm -13 <(printf '%s\n' "$previous_interface") <(printf '%s\n' "$head_interface"))
+  removed=$(comm -23 <(printf '%s\n' "$previous_interface") <(printf '%s\n' "$head_interface"))
 
-bump=$(classify_bump "$added" "$removed")
-next=$(next_version "$published" "$bump")
+  bump=$(classify_bump "$added" "$removed")
+  next=$(next_version "$published" "$bump")
 
-if has_releasable_changes; then
-  release=true
-else
-  release=false
-fi
+  if has_releasable_changes "$published"; then
+    release=true
+  else
+    release=false
+  fi
 
-report >&2
+  report >&2
 
-emit package "$package"
-emit declared "$declared"
-emit published "$published"
-emit bump "$bump"
-emit next "$next"
-emit release "$release"
+  emit package "$package"
+  emit declared "$declared"
+  emit published "$published"
+  emit bump "$bump"
+  emit next "$next"
+  emit release "$release"
+}
+
+main

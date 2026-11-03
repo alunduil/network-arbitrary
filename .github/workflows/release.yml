@@ -32,8 +32,8 @@ env:
   CABAL_VERSION: "3.18.2.0"
 
 jobs:
-  build:
-    name: Build the release artifact
+  compute:
+    name: Compute the next version
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-26.04
     timeout-minutes: 60
@@ -77,13 +77,33 @@ jobs:
           echo "::error::main declares $DECLARED but Hackage last published $PUBLISHED. Re-run the failed release's publish job."
           exit 1
 
+  build:
+    name: Build the release artifact
+    needs: compute
+    if: needs.compute.outputs.release == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    env:
+      VERSION: ${{ needs.compute.outputs.next }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up GHC
+        uses: ./.github/actions/setup-ghc
+        with:
+          ghc-version: ${{ env.GHC_VERSION }}
+          cabal-version: ${{ env.CABAL_VERSION }}
+
+      - name: Update Hackage index
+        run: cabal update
+
       # ci.yml built this source across the matrix on the way into main. The
       # sdist carrying the new version is what Hackage receives, and ci.yml
       # never sees it.
       - name: Verify the sdist
-        if: steps.version.outputs.release == 'true'
-        env:
-          VERSION: ${{ steps.version.outputs.next }}
         run: |
           set -euo pipefail
 
@@ -103,22 +123,13 @@ jobs:
       # The patch rather than a second apply-version.sh run, so the commit
       # carries the changelog date the sdist does.
       - name: Prepare the artifact
-        if: steps.version.outputs.release == 'true'
-        env:
-          VERSION: ${{ steps.version.outputs.next }}
         run: |
           set -euo pipefail
 
           git diff >release.patch
-
-          awk -v version="$VERSION" '
-            $0 ~ "^## " version "  --" { capture = 1; next }
-            capture && /^## / { exit }
-            capture { print }
-          ' ChangeLog.md >release-notes.md
+          ./scripts/release-notes.sh "$VERSION" >release-notes.md
 
       - name: Upload the artifact
-        if: steps.version.outputs.release == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ env.ARTIFACT }}
@@ -131,8 +142,7 @@ jobs:
 
   land:
     name: Land the release pull request
-    needs: build
-    if: needs.build.outputs.release == 'true'
+    needs: [compute, build]
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     permissions:
@@ -141,10 +151,10 @@ jobs:
       pull-requests: read
       statuses: read
     env:
-      BRANCH: release/v${{ needs.build.outputs.next }}
-      VERSION: ${{ needs.build.outputs.next }}
-      BUMP: ${{ needs.build.outputs.bump }}
-      PUBLISHED: ${{ needs.build.outputs.published }}
+      BRANCH: release/v${{ needs.compute.outputs.next }}
+      VERSION: ${{ needs.compute.outputs.next }}
+      BUMP: ${{ needs.compute.outputs.bump }}
+      PUBLISHED: ${{ needs.compute.outputs.published }}
     steps:
       # A pull request opened with GITHUB_TOKEN starts no workflows, so the
       # checks main requires would never report, and the ruleset only lets
@@ -187,7 +197,8 @@ jobs:
           the last version published to Hackage.
           COMMIT
 
-          git push origin "$BRANCH"
+      - name: Push the release branch
+        run: git push origin "$BRANCH"
 
       - name: Open the release pull request
         id: pr
@@ -251,13 +262,13 @@ jobs:
 
   publish:
     name: Publish to Hackage
-    needs: [build, land]
+    needs: [compute, land]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     environment: hackage
     env:
-      PACKAGE: ${{ needs.build.outputs.package }}
-      VERSION: ${{ needs.build.outputs.next }}
+      PACKAGE: ${{ needs.compute.outputs.package }}
+      VERSION: ${{ needs.compute.outputs.next }}
     steps:
       - name: Set up GHC
         uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
@@ -292,7 +303,7 @@ jobs:
 
   announce:
     name: Create the GitHub release
-    needs: [build, publish]
+    needs: [compute, publish]
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
@@ -307,7 +318,7 @@ jobs:
       - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ needs.build.outputs.next }}
+          VERSION: ${{ needs.compute.outputs.next }}
         run: |
           gh release create "v$VERSION" \
             --repo "$GITHUB_REPOSITORY" \
