@@ -43,10 +43,10 @@ runs:
           ghc_source=cache
           paths+=("$ghcup/ghc/$ghc")
         fi
-        # Pull requests share only caches saved on main, so a key per
-        # weekly image patch misses on every pull request until main runs
-        # on that patch. Recording where GHC comes from makes an image
-        # that drops it miss instead of restoring an entry without GHC.
+        # Pull requests restore only caches saved on main, and runner
+        # image patches roll out unevenly, so the key names the OS
+        # release alone. The GHC source makes an image that stops
+        # shipping its GHC miss rather than restore an entry without it.
         key="ghcup-${ImageOS:?}-$RUNNER_ARCH-ghc-$ghc-$ghc_source-cabal-$CABAL"
         {
           echo "ghc=$ghc"
