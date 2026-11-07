@@ -40,8 +40,6 @@ jobs:
             GHC_VERSION: "9.12.4"
           - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
             GHC_VERSION: "9.14.1"
-            # Package metadata and docs don't vary by GHC or OS, so one
-            # Ubuntu cell checks them.
             package-checks: true
         include:
           - os: ubuntu
@@ -52,6 +50,11 @@ jobs:
             # https://github.com/actions/runner-images/issues/14940
             # renovate: datasource=github-runners depName=macos
             OS_VERSION: "26"
+
+    env:
+      # Package metadata and docs don't vary by GHC or OS, so one cell
+      # checks them.
+      PACKAGE_CHECKS: ${{ matrix.ghc.package-checks && matrix.os == 'ubuntu' }}
 
     steps:
       - name: Checkout
@@ -101,12 +104,12 @@ jobs:
         run: cabal test all --test-show-details=direct
 
       - name: Check package metadata
-        if: matrix.ghc.package-checks && matrix.os == 'ubuntu'
+        if: env.PACKAGE_CHECKS == 'true'
         working-directory: sdist-build
         run: cabal check
 
       - name: Haddock
-        if: matrix.ghc.package-checks && matrix.os == 'ubuntu'
+        if: env.PACKAGE_CHECKS == 'true'
         working-directory: sdist-build
         run: cabal haddock all
 
