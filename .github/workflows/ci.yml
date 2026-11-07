@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: GHC ${{ matrix.ghc }} / ${{ matrix.os }}
+    name: GHC ${{ matrix.ghc.GHC_VERSION }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-${{ matrix.OS_VERSION }}
     timeout-minutes: 30
 
@@ -27,7 +27,22 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
+        # One entry per GHC series. The compatibility group holds each
+        # entry to its series, so Renovate bumps only the patch release.
+        ghc:
+          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+            GHC_VERSION: "9.6.7"
+          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+            GHC_VERSION: "9.8.4"
+          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+            GHC_VERSION: "9.10.3"
+          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+            GHC_VERSION: "9.12.4"
+          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+            GHC_VERSION: "9.14.1"
+            # Package metadata and docs don't vary by GHC or OS, so one
+            # Ubuntu cell checks them.
+            package-checks: true
         include:
           - os: ubuntu
             # renovate: datasource=github-runners depName=ubuntu
@@ -37,10 +52,6 @@ jobs:
             # https://github.com/actions/runner-images/issues/14940
             # renovate: datasource=github-runners depName=macos
             OS_VERSION: "26"
-          # Package metadata and docs don't vary by GHC or OS.
-          - os: ubuntu
-            ghc: "9.14"
-            package-checks: true
 
     steps:
       - name: Checkout
@@ -50,7 +61,7 @@ jobs:
         id: setup
         uses: ./.github/actions/setup-ghc
         with:
-          ghc-version: ${{ matrix.ghc }}
+          ghc-version: ${{ matrix.ghc.GHC_VERSION }}
           cabal-version: ${{ env.CABAL_VERSION }}
 
       - name: Update Hackage index
@@ -90,12 +101,12 @@ jobs:
         run: cabal test all --test-show-details=direct
 
       - name: Check package metadata
-        if: matrix.package-checks
+        if: matrix.ghc.package-checks && matrix.os == 'ubuntu'
         working-directory: sdist-build
         run: cabal check
 
       - name: Haddock
-        if: matrix.package-checks
+        if: matrix.ghc.package-checks && matrix.os == 'ubuntu'
         working-directory: sdist-build
         run: cabal haddock all
 

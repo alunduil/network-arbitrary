@@ -57,7 +57,10 @@ jobs:
             | sort -V)
           require_series endoflife.date "$expected"
 
-          matrix=$(yq '.jobs.build.strategy.matrix.ghc[]' "$ci_file" | sort -V)
+          # Each matrix entry pins an exact release; its series is the
+          # first two components.
+          matrix=$(yq '.jobs.build.strategy.matrix.ghc[].GHC_VERSION' "$ci_file" \
+            | cut -d. -f1,2 | sort -V)
           require_series "$ci_file" "$matrix"
 
           # tested-with spells each series as `>=X.Y && <X.Y+1`, so the
