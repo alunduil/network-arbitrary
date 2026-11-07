@@ -25,6 +25,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      # Renovate's regex manager only matches keys ending in _VERSION.
       matrix:
         os: [ubuntu, macos]
         # One entry per GHC series upstream hasn't end-of-lifed. Renovate
@@ -46,8 +47,6 @@ jobs:
             # renovate: datasource=github-runners depName=ubuntu
             OS_VERSION: "26.04"
           - os: macos
-            # GHC can't link on macos-26:
-            # https://github.com/actions/runner-images/issues/14940
             # renovate: datasource=github-runners depName=macos
             OS_VERSION: "26"
 
@@ -118,8 +117,7 @@ jobs:
     timeout-minutes: 30
 
     env:
-      # The step condition below reads this rather than secrets directly,
-      # which the steps context cannot see.
+      # Step `if:` conditions can't read secrets, so the upload checks this copy.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       # renovate: datasource=github-tags depName=ghc/ghc
       GHC_VERSION: "9.14.1"
