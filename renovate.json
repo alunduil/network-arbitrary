@@ -12,6 +12,12 @@
       "automerge": true
     },
     {
+      "description": "Renovate never changes a compatibility group, so each GHC pin moves only within its series. The weekly drift check flags series changes.",
+      "matchPackageNames": ["ghc/ghc"],
+      "versioning": "regex:^(?<compatibility>\\d+\\.\\d+)\\.(?<patch>\\d+)$",
+      "extractVersion": "^ghc-(?<version>\\d+\\.\\d+\\.\\d+)-release$"
+    },
+    {
       "description": "Default versioning hides four-component PVP versions. hlint's tags carry a v prefix that mise.toml omits.",
       "matchManagers": ["mise"],
       "matchPackageNames": ["ndmitchell/hlint", "tweag/ormolu"],
