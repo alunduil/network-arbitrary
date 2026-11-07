@@ -12,7 +12,7 @@
       "automerge": true
     },
     {
-      "description": "Hold each GHC pin to its series: Renovate never changes the compatibility group, so it bumps only the patch release. Series changes follow the weekly drift check's issue.",
+      "description": "Renovate never changes a compatibility group, so each GHC pin moves only within its series. The weekly drift check flags series changes.",
       "matchPackageNames": ["ghc/ghc"],
       "versioning": "regex:^(?<compatibility>\\d+\\.\\d+)\\.(?<patch>\\d+)$",
       "extractVersion": "^ghc-(?<version>\\d+\\.\\d+\\.\\d+)-release$"

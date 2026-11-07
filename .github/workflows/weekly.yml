@@ -57,8 +57,6 @@ jobs:
             | sort -V)
           require_series endoflife.date "$expected"
 
-          # Each matrix entry pins an exact release; its series is the
-          # first two components.
           matrix=$(yq '.jobs.build.strategy.matrix.ghc[].GHC_VERSION' "$ci_file" \
             | cut -d. -f1,2 | sort -V)
           require_series "$ci_file" "$matrix"

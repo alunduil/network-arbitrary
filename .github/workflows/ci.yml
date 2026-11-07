@@ -27,8 +27,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        # One entry per GHC series. Renovate bumps patch releases; the
-        # weekly drift check flags series changes.
+        # One entry per GHC series upstream hasn't end-of-lifed. Renovate
+        # bumps only patch releases; add or drop a series by hand.
         ghc:
           - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.6.7"
@@ -52,8 +52,7 @@ jobs:
             OS_VERSION: "26"
 
     env:
-      # Package metadata and docs don't vary by GHC or OS, so one cell
-      # checks them.
+      # Package metadata and docs don't vary by GHC or OS.
       PACKAGE_CHECKS: ${{ matrix.ghc.package-checks && matrix.os == 'ubuntu' }}
 
     steps:
