@@ -27,18 +27,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        # One entry per GHC series. The compatibility group holds each
-        # entry to its series, so Renovate bumps only the patch release.
+        # One entry per GHC series. Renovate bumps patch releases; the
+        # weekly drift check flags series changes.
         ghc:
-          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+          - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.6.7"
-          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+          - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.8.4"
-          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+          - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.10.3"
-          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+          - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.12.4"
-          - # renovate: datasource=github-tags depName=ghc/ghc versioning=regex:^(?<compatibility>\d+\.\d+)\.(?<patch>\d+)$ extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+          - # renovate: datasource=github-tags depName=ghc/ghc
             GHC_VERSION: "9.14.1"
             package-checks: true
         include:
@@ -122,7 +122,7 @@ jobs:
       # The step condition below reads this rather than secrets directly,
       # which the steps context cannot see.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+      # renovate: datasource=github-tags depName=ghc/ghc
       GHC_VERSION: "9.14.1"
 
     steps:

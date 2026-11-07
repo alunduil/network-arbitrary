@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-26.04
     environment: hackage
     env:
-      # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+      # renovate: datasource=github-tags depName=ghc/ghc
       GHC_VERSION: "9.14.1"
       # renovate: datasource=github-tags depName=haskell/cabal versioning=loose extractVersion=^cabal-install-v(?<version>\d+\.\d+\.\d+\.\d+)$
       CABAL_VERSION: "3.18.2.0"
