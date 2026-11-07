@@ -28,6 +28,7 @@ jobs:
       matrix:
         os: [ubuntu, macos]
         ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
+        # Renovate's regex manager only matches keys ending in _VERSION.
         include:
           - os: ubuntu
             # renovate: datasource=github-runners depName=ubuntu
@@ -103,8 +104,7 @@ jobs:
     timeout-minutes: 30
 
     env:
-      # The step condition below reads this rather than secrets directly,
-      # which the steps context cannot see.
+      # Step `if:` conditions can't read secrets, so the upload checks this copy.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
       GHC_VERSION: "9.14.1"
