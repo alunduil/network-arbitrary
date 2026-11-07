@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: GHC ${{ matrix.ghc }} / ${{ matrix.os }}
+    name: GHC ${{ matrix.ghc.GHC_VERSION }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-${{ matrix.OS_VERSION }}
     timeout-minutes: 30
 
@@ -27,7 +27,20 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        ghc: ["9.6", "9.8", "9.10", "9.12", "9.14"]
+        # One entry per GHC series upstream hasn't end-of-lifed. Renovate
+        # bumps only patch releases; add or drop a series by hand.
+        ghc:
+          - # renovate: datasource=github-tags depName=ghc/ghc
+            GHC_VERSION: "9.6.7"
+          - # renovate: datasource=github-tags depName=ghc/ghc
+            GHC_VERSION: "9.8.4"
+          - # renovate: datasource=github-tags depName=ghc/ghc
+            GHC_VERSION: "9.10.3"
+          - # renovate: datasource=github-tags depName=ghc/ghc
+            GHC_VERSION: "9.12.4"
+          - # renovate: datasource=github-tags depName=ghc/ghc
+            GHC_VERSION: "9.14.1"
+            package-checks: true
         include:
           - os: ubuntu
             # renovate: datasource=github-runners depName=ubuntu
@@ -37,10 +50,10 @@ jobs:
             # https://github.com/actions/runner-images/issues/14940
             # renovate: datasource=github-runners depName=macos
             OS_VERSION: "26"
-          # Package metadata and docs don't vary by GHC or OS.
-          - os: ubuntu
-            ghc: "9.14"
-            package-checks: true
+
+    env:
+      # Package metadata and docs don't vary by GHC or OS.
+      PACKAGE_CHECKS: ${{ matrix.ghc.package-checks && matrix.os == 'ubuntu' }}
 
     steps:
       - name: Checkout
@@ -50,7 +63,7 @@ jobs:
         id: setup
         uses: ./.github/actions/setup-ghc
         with:
-          ghc-version: ${{ matrix.ghc }}
+          ghc-version: ${{ matrix.ghc.GHC_VERSION }}
           cabal-version: ${{ env.CABAL_VERSION }}
 
       - name: Update Hackage index
@@ -90,12 +103,12 @@ jobs:
         run: cabal test all --test-show-details=direct
 
       - name: Check package metadata
-        if: matrix.package-checks
+        if: env.PACKAGE_CHECKS == 'true'
         working-directory: sdist-build
         run: cabal check
 
       - name: Haddock
-        if: matrix.package-checks
+        if: env.PACKAGE_CHECKS == 'true'
         working-directory: sdist-build
         run: cabal haddock all
 
@@ -108,7 +121,7 @@ jobs:
       # The step condition below reads this rather than secrets directly,
       # which the steps context cannot see.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+      # renovate: datasource=github-tags depName=ghc/ghc
       GHC_VERSION: "9.14.1"
 
     steps:
