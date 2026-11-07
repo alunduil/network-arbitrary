@@ -1,31 +1,328 @@
 name: Release
 
+# Cuts a release without a human choosing the version: the bump is derived
+# from an interface diff against what Hackage last published (see
+# scripts/compute-version.sh), and a run where nothing shippable changed
+# stops after the computation.
+#
+# Each job re-runs on its own from the artifact the build job uploaded, so a
+# failure after the merge resumes with the same bytes instead of starting a
+# second release.
+
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+  schedule:
+    # Monday morning, after the week's Renovate pull requests have had time
+    # to land.
+    - cron: "0 9 * * 1"
+      timezone: "Europe/London"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  ARTIFACT: release
+  # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
+  GHC_VERSION: "9.14.1"
+  # renovate: datasource=github-tags depName=haskell/cabal versioning=loose extractVersion=^cabal-install-v(?<version>\d+\.\d+\.\d+\.\d+)$
+  CABAL_VERSION: "3.18.2.0"
+
 jobs:
-  publish:
-    name: Publish to Hackage
+  compute:
+    name: Compute the next version
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-26.04
-    environment: hackage
-    env:
-      # renovate: datasource=github-tags depName=ghc/ghc extractVersion=^ghc-(?<version>\d+\.\d+\.\d+)-release$
-      GHC_VERSION: "9.14.1"
-      # renovate: datasource=github-tags depName=haskell/cabal versioning=loose extractVersion=^cabal-install-v(?<version>\d+\.\d+\.\d+\.\d+)$
-      CABAL_VERSION: "3.18.2.0"
+    timeout-minutes: 60
+    outputs:
+      package: ${{ steps.version.outputs.package }}
+      published: ${{ steps.version.outputs.published }}
+      bump: ${{ steps.version.outputs.bump }}
+      next: ${{ steps.version.outputs.next }}
+      release: ${{ steps.version.outputs.release }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The release decision compares HEAD against the tag of the last
+          # published version, so the full history and its tags are needed.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up GHC
+        uses: ./.github/actions/setup-ghc
         with:
           ghc-version: ${{ env.GHC_VERSION }}
           cabal-version: ${{ env.CABAL_VERSION }}
-      - name: cabal sdist
-        run: cabal sdist
-      - name: cabal upload
+
+      - name: Update Hackage index
+        run: cabal update
+
+      - name: Compute next version
+        id: version
+        run: ./scripts/compute-version.sh
+
+      # A mismatch means an earlier run merged its bump and never published.
+      # Rolling the changelog again would write a second heading for the
+      # version, so that run's publish job has to finish first.
+      - name: Require the last release to have published
+        if: steps.version.outputs.release == 'true' && steps.version.outputs.declared != steps.version.outputs.published
+        env:
+          DECLARED: ${{ steps.version.outputs.declared }}
+          PUBLISHED: ${{ steps.version.outputs.published }}
+        run: |
+          echo "::error::main declares $DECLARED but Hackage last published $PUBLISHED. Re-run the failed release's publish job."
+          exit 1
+
+  build:
+    name: Build the release artifact
+    needs: compute
+    if: needs.compute.outputs.release == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    env:
+      VERSION: ${{ needs.compute.outputs.next }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up GHC
+        uses: ./.github/actions/setup-ghc
+        with:
+          ghc-version: ${{ env.GHC_VERSION }}
+          cabal-version: ${{ env.CABAL_VERSION }}
+
+      - name: Update Hackage index
+        run: cabal update
+
+      # ci.yml built this source across the matrix on the way into main. The
+      # sdist carrying the new version is what Hackage receives, and ci.yml
+      # never sees it.
+      - name: Verify the sdist
+        run: |
+          set -euo pipefail
+
+          ./scripts/apply-version.sh "$VERSION"
+
+          cabal sdist
+          cabal haddock --haddock-for-hackage
+
+          mkdir sdist-build
+          tar xf dist-newstyle/sdist/*.tar.gz -C sdist-build --strip-components=1
+
+          cd sdist-build
+          cabal build all --enable-tests
+          cabal test all --test-show-details=direct
+          cabal check
+
+      # The patch rather than a second apply-version.sh run, so the commit
+      # carries the changelog date the sdist does.
+      - name: Prepare the artifact
+        run: |
+          set -euo pipefail
+
+          git diff >release.patch
+          ./scripts/release-notes.sh "$VERSION" >release-notes.md
+
+      - name: Upload the artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ env.ARTIFACT }}
+          if-no-files-found: error
+          path: |
+            dist-newstyle/sdist/*.tar.gz
+            dist-newstyle/*-docs.tar.gz
+            release.patch
+            release-notes.md
+
+  land:
+    name: Land the release pull request
+    needs: [compute, build]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: read
+      statuses: read
+    env:
+      BRANCH: release/v${{ needs.compute.outputs.next }}
+      VERSION: ${{ needs.compute.outputs.next }}
+      BUMP: ${{ needs.compute.outputs.bump }}
+      PUBLISHED: ${{ needs.compute.outputs.published }}
+    steps:
+      # A pull request opened with GITHUB_TOKEN starts no workflows, so the
+      # checks main requires would never report, and the ruleset only lets
+      # bypass actors merge.
+      - name: Mint the release App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Download the artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ runner.temp }}/release
+
+      # Authored as github-actions[bot]: the ruleset holds unattributed
+      # changes for an approval that never comes.
+      - name: Commit the version bump
+        run: |
+          set -euo pipefail
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git switch -c "$BRANCH"
+          git apply "$RUNNER_TEMP/release/release.patch"
+
+          # Read from stdin so the body is not indented by this block scalar.
+          git commit -a -F - <<COMMIT
+          Release $VERSION
+
+          Computed a $BUMP bump from the interface diff against $PUBLISHED,
+          the last version published to Hackage.
+          COMMIT
+
+      - name: Push the release branch
+        run: git push origin "$BRANCH"
+
+      - name: Open the release pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          url=$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Release $VERSION" \
+            --body "Derived a \`$BUMP\` bump from the interface diff against \`$PUBLISHED\`, the last version published to Hackage. Opened and merged by \`release.yml\`; the sdist was built and tested before this opened.")
+
+          echo "url=$url" >>"$GITHUB_OUTPUT"
+
+      # gh reports an error rather than pending until the checks have
+      # registered, so they get a head start.
+      - name: Wait for required checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.url }}
+        run: |
+          sleep 30
+          gh pr checks "$PR" --required --watch --fail-fast
+
+      # Strict status checks refuse this if anything landed on main since the
+      # build, so the merged tree is always the tree the sdist came from.
+      - name: Merge the release pull request
+        id: merge
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ steps.pr.outputs.url }}
+        run: gh pr merge "$PR" --squash --delete-branch
+
+      - name: Tag the squash commit
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ steps.pr.outputs.url }}
+        run: |
+          set -euo pipefail
+
+          commit=$(gh pr view "$PR" --json mergeCommit --jq .mergeCommit.oid)
+
+          git fetch origin "$commit"
+          git tag "v$VERSION" "$commit"
+          git push origin "v$VERSION"
+
+      # Before the merge nothing has happened that a later run can't redo, so
+      # the next run starts clean from whatever main is then.
+      - name: Abandon the release pull request
+        if: failure() && steps.merge.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ steps.pr.outputs.url }}
+        run: |
+          if [ -n "$PR" ]; then
+            gh pr close "$PR" || true
+          fi
+          git push origin --delete "$BRANCH" || true
+
+  publish:
+    name: Publish to Hackage
+    needs: [compute, land]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    environment: hackage
+    env:
+      PACKAGE: ${{ needs.compute.outputs.package }}
+      VERSION: ${{ needs.compute.outputs.next }}
+    steps:
+      - name: Set up GHC
+        uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
+        with:
+          ghc-version: ${{ env.GHC_VERSION }}
+          cabal-version: ${{ env.CABAL_VERSION }}
+
+      - name: Download the artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ env.ARTIFACT }}
+
+      # Hackage refuses a second upload of a version, so a re-run after the
+      # documentation upload failed has to step over the sdist.
+      - name: Publish the sdist
         env:
           HACKAGE_API_KEY: ${{ secrets.HACKAGE_API_KEY }}
-        run: cabal upload --publish --token="$HACKAGE_API_KEY" dist-newstyle/sdist/*.tar.gz
+        run: |
+          set -euo pipefail
+
+          url="https://hackage.haskell.org/package/$PACKAGE-$VERSION/$PACKAGE-$VERSION.tar.gz"
+          if curl -fsIL "$url" >/dev/null; then
+            echo "$PACKAGE-$VERSION is already on Hackage"
+          else
+            cabal upload --publish --token="$HACKAGE_API_KEY" dist-newstyle/sdist/*.tar.gz
+          fi
+
+      - name: Publish the documentation
+        env:
+          HACKAGE_API_KEY: ${{ secrets.HACKAGE_API_KEY }}
+        run: cabal upload --publish --documentation --token="$HACKAGE_API_KEY" dist-newstyle/*-docs.tar.gz
+
+  announce:
+    name: Create the GitHub release
+    needs: [compute, publish]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download the artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ env.ARTIFACT }}
+
+      # Created last so a release only exists for a version Hackage accepted.
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.compute.outputs.next }}
+        run: |
+          gh release create "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "v$VERSION" \
+            --notes-file release-notes.md \
+            dist-newstyle/sdist/*.tar.gz
