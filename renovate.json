@@ -25,7 +25,7 @@
       "extractVersion": "^v?(?<version>.+)$"
     },
     {
-      "description": "ghcup-hs carries tags with no release download, such as v0.21; only published releases are real versions.",
+      "description": "Some ghcup-hs tags, such as v0.21, have no release download.",
       "matchManagers": ["mise"],
       "matchPackageNames": ["haskell/ghcup-hs"],
       "overrideDatasource": "github-releases"
