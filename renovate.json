@@ -25,6 +25,12 @@
       "extractVersion": "^v?(?<version>.+)$"
     },
     {
+      "description": "ghcup-hs carries a stray v0.21 tag with no release download, which sorts above every real 0.2.x release.",
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["haskell/ghcup-hs"],
+      "allowedVersions": "!/^0\\.21$/"
+    },
+    {
       "description": "tasty-quickcheck bounds both tasty and QuickCheck, so bumping one alone can open a PR that fails to resolve.",
       "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
