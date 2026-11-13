@@ -202,14 +202,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # post-create.sh fails the build if mise, GHC, or cabal won't install;
+      # runCmd only checks that ghc is on the user's PATH.
       - name: Build the devcontainer and check its tools
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           push: never
-          runCmd: >-
-            test -z "$(mise ls --missing)"
-            && ghc --version
-            && cabal --version
+          runCmd: ghc --version
 
   dependency-review:
     name: Review dependencies
