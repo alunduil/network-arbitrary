@@ -191,6 +191,25 @@ jobs:
       - name: Run pre-commit hooks
         run: prek run --all-files --show-diff-on-failure --color=always
 
+  # The devcontainer is ghcup's only consumer, so only this job catches a
+  # ghcup release that installs but can't install GHC or cabal.
+  devcontainer:
+    name: Build the devcontainer
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # post-create.sh already fails the build when a tool won't install. It
+      # never runs ghc, so runCmd checks that the user's PATH reaches it.
+      - name: Build the devcontainer and check its tools
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+        with:
+          push: never
+          runCmd: ghc --version
+
   dependency-review:
     name: Review dependencies
     if: github.event_name == 'pull_request'
@@ -211,7 +230,7 @@ jobs:
     name: Check CI results
     runs-on: ubuntu-26.04
     timeout-minutes: 5
-    needs: [build, coverage, pre-commit, dependency-review]
+    needs: [build, coverage, pre-commit, devcontainer, dependency-review]
     if: always()
 
     steps:
