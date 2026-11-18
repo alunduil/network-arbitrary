@@ -18,41 +18,56 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  # tested-with in network-arbitrary.cabal is the only list of GHC versions.
+  ghc-versions:
+    name: List tested GHC versions
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      newest: ${{ fromJSON(steps.newest.outputs.matrix)[0] }}
+
+    # Renovate's regex manager only matches keys ending in _VERSION.
+    env:
+      # renovate: datasource=github-releases depName=Kleidukos/get-tested versioning=loose extractVersion=^v(?<version>.+)$
+      GET_TESTED_VERSION: "0.1.10.0"
+      # renovate: datasource=github-runners depName=ubuntu
+      UBUNTU_VERSION: "26.04"
+      # renovate: datasource=github-runners depName=macos
+      MACOS_VERSION: "26"
+
+    steps:
+      - name: List the build matrix
+        id: matrix
+        uses: Kleidukos/get-tested@66e7d3233e529aee4a22ff5096288faa26f3fc28
+        with:
+          cabal-file: network-arbitrary.cabal
+          version: ${{ env.GET_TESTED_VERSION }}
+          ubuntu-version: ${{ env.UBUNTU_VERSION }}
+          macos-version: ${{ env.MACOS_VERSION }}
+
+      - name: Find the newest GHC
+        id: newest
+        uses: Kleidukos/get-tested@66e7d3233e529aee4a22ff5096288faa26f3fc28
+        with:
+          cabal-file: network-arbitrary.cabal
+          version: ${{ env.GET_TESTED_VERSION }}
+          newest: true
+          versions-only: true
+
   build:
-    name: GHC ${{ matrix.ghc.GHC_VERSION }} / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-${{ matrix.OS_VERSION }}
+    name: GHC ${{ matrix.ghc }} / ${{ matrix.os }}
+    needs: ghc-versions
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
-      # Renovate's regex manager only matches keys ending in _VERSION.
-      matrix:
-        os: [ubuntu, macos]
-        # One entry per GHC series upstream hasn't end-of-lifed. Renovate
-        # bumps only patch releases; add or drop a series by hand.
-        ghc:
-          - # renovate: datasource=github-tags depName=ghc/ghc
-            GHC_VERSION: "9.6.7"
-          - # renovate: datasource=github-tags depName=ghc/ghc
-            GHC_VERSION: "9.8.4"
-          - # renovate: datasource=github-tags depName=ghc/ghc
-            GHC_VERSION: "9.10.3"
-          - # renovate: datasource=github-tags depName=ghc/ghc
-            GHC_VERSION: "9.12.4"
-          - # renovate: datasource=github-tags depName=ghc/ghc
-            GHC_VERSION: "9.14.1"
-            package-checks: true
-        include:
-          - os: ubuntu
-            # renovate: datasource=github-runners depName=ubuntu
-            OS_VERSION: "26.04"
-          - os: macos
-            # renovate: datasource=github-runners depName=macos
-            OS_VERSION: "26"
+      matrix: ${{ fromJSON(needs.ghc-versions.outputs.matrix) }}
 
     env:
       # Package metadata and docs don't vary by GHC or OS.
-      PACKAGE_CHECKS: ${{ matrix.ghc.package-checks && matrix.os == 'ubuntu' }}
+      PACKAGE_CHECKS: ${{ matrix.newest && startsWith(matrix.os, 'ubuntu-') }}
 
     steps:
       - name: Checkout
@@ -62,7 +77,7 @@ jobs:
         id: setup
         uses: ./.github/actions/setup-ghc
         with:
-          ghc-version: ${{ matrix.ghc.GHC_VERSION }}
+          ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ env.CABAL_VERSION }}
 
       - name: Update Hackage index
@@ -113,14 +128,13 @@ jobs:
 
   coverage:
     name: Coverage
+    needs: ghc-versions
     runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     env:
       # Step `if:` conditions can't read secrets, so the upload checks this copy.
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      # renovate: datasource=github-tags depName=ghc/ghc
-      GHC_VERSION: "9.14.1"
 
     steps:
       - name: Checkout
@@ -130,7 +144,7 @@ jobs:
         id: setup
         uses: ./.github/actions/setup-ghc
         with:
-          ghc-version: ${{ env.GHC_VERSION }}
+          ghc-version: ${{ needs.ghc-versions.outputs.newest }}
           cabal-version: ${{ env.CABAL_VERSION }}
 
       - name: Update Hackage index
@@ -230,7 +244,7 @@ jobs:
     name: Check CI results
     runs-on: ubuntu-26.04
     timeout-minutes: 5
-    needs: [build, coverage, pre-commit, devcontainer, dependency-review]
+    needs: [ghc-versions, build, coverage, pre-commit, devcontainer, dependency-review]
     if: always()
 
     steps:
