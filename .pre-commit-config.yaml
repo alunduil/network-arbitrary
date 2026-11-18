@@ -23,8 +23,7 @@ repos:
     rev: v0.24.1
     hooks:
       - id: markdownlint-cli2
-        # The Contributor Covenant is boilerplate; restyling it to our rules
-        # forks it. .vale.ini exempts it for the same reason.
+        # Restyling the verbatim Contributor Covenant would fork it.
         exclude: ^CODE_OF_CONDUCT\.md$
   # Styles are vendored under .vale/styles (see the top-level exclude),
   # so the hook needs no `vale sync` step.
@@ -59,9 +58,9 @@ repos:
         language: system
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]
-      # --offline gates on the relative links, which break with the diff that
-      # renames their target. External URLs rot on their own schedule, so the
-      # weekly job owns those.
+      # Relative links break in the change that renames their target, so they
+      # gate every commit. External links break without a commit, so the
+      # weekly job checks those.
       - id: lychee
         name: lychee
         entry: lychee --config lychee.toml --offline

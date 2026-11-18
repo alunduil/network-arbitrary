@@ -150,9 +150,8 @@ jobs:
         with:
           install_args: lychee
 
-      # Only a pull request fails on a dead link; other runs go on to file an
-      # issue. The token lifts GitHub's anonymous rate limit on github.com
-      # links.
+      # Scheduled runs report dead links through an issue instead of failing.
+      # The token raises GitHub's rate limit for github.com links.
       - name: Check links
         id: lychee
         continue-on-error: ${{ github.event_name != 'pull_request' }}
@@ -166,7 +165,7 @@ jobs:
             | tee lychee/out.md "$GITHUB_STEP_SUMMARY"
 
       # create-an-issue reads the title and labels from front matter, which
-      # lychee's report has no way to carry.
+      # lychee's report lacks.
       - name: Compose broken-links issue
         id: compose
         if: steps.lychee.outcome == 'failure'

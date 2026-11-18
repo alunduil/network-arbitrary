@@ -202,9 +202,8 @@ jobs:
       - name: Run pre-commit hooks
         run: prek run --all-files --show-diff-on-failure --color=always
 
-  # vale exits zero on warnings, so reviewdog gates them; the pre-commit hook
-  # gates errors tree-wide. reviewdog needs a PR diff, so only its step is
-  # guarded: on push the job succeeds empty and `results` can still require it.
+  # Vale exits zero on warnings, so reviewdog fails the job on warnings a pull
+  # request adds. The Vale pre-commit hook fails on errors anywhere.
   prose:
     name: Check prose
     runs-on: ubuntu-26.04
@@ -239,7 +238,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Explicit bash enables pipefail; without it a vale crash passes.
+        # Explicit bash enables pipefail, so a Vale crash fails the step.
         shell: bash
         run: |
           vale --no-exit --output=JSON . \
