@@ -202,6 +202,63 @@ jobs:
       - name: Run pre-commit hooks
         run: prek run --all-files --show-diff-on-failure --color=always
 
+  # vale exits zero on warnings, so reviewdog gates them; the pre-commit hook
+  # gates errors tree-wide. reviewdog needs a PR diff, so only its step is
+  # guarded: on push the job succeeds empty and `results` can still require it.
+  prose:
+    name: Check prose
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      checks: write
+
+    env:
+      # Match the vale hook's rev in .pre-commit-config.yaml.
+      # renovate: datasource=github-releases depName=errata-ai/vale extractVersion=^v(?<version>.+)$
+      VALE_VERSION: "3.27.0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Vale
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL \
+            "https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz" \
+            | tar xz -C "$HOME/.local/bin" vale
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Set up reviewdog
+        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        with:
+          install_args: reviewdog
+
+      - name: Check prose on changed lines
+        if: github.event_name == 'pull_request'
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Explicit bash enables pipefail; without it a vale crash passes.
+        shell: bash
+        run: |
+          vale --no-exit --output=JSON . \
+            | jq -c '
+              to_entries[] | .key as $p | .value[] | {
+                message: .Message,
+                location: {
+                  path: $p,
+                  range: {
+                    start: {line: .Line, column: .Span[0]},
+                    end: {line: .Line, column: (.Span[1] + 1)},
+                  },
+                },
+                severity: ({error: "ERROR", warning: "WARNING", suggestion: "INFO"}[.Severity]),
+                code: {value: .Check},
+              }' \
+            | reviewdog -f=rdjsonl -name=vale \
+                -reporter=github-pr-check -filter-mode=added -fail-level=warning
+
   # The devcontainer is ghcup's only consumer, so only this job catches a
   # ghcup release that installs but can't install GHC or cabal.
   devcontainer:
@@ -241,7 +298,7 @@ jobs:
     name: Check CI results
     runs-on: ubuntu-26.04
     timeout-minutes: 5
-    needs: [ghc-versions, build, coverage, pre-commit, devcontainer, dependency-review]
+    needs: [ghc-versions, build, coverage, pre-commit, prose, devcontainer, dependency-review]
     if: always()
 
     steps:
