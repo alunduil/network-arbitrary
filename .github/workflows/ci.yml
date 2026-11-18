@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  # tested-with in network-arbitrary.cabal is the only list of GHC versions.
+  # To add or drop a GHC version, edit tested-with in network-arbitrary.cabal.
   ghc-versions:
     name: List tested GHC versions
     runs-on: ubuntu-26.04

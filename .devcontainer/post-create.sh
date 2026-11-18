@@ -3,7 +3,7 @@ set -euo pipefail
 
 mise install
 
-# tested-with and ci.yml hold the only GHC and cabal pins Renovate bumps.
+# Renovate bumps GHC in tested-with and cabal in ci.yml, so read both there.
 first_match() {
   local version
   version=$(sed -n "$1" "$2" | head -n 1)

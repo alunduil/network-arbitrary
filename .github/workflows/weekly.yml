@@ -48,8 +48,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          # An empty set means an upstream schema change rather than a
-          # real drift, so abort the run.
+          # An empty set means a source changed its format, so abort
+          # instead of reporting drift.
           require_series() {
             if [ -z "$2" ]; then
               echo "no GHC series parsed from $1; aborting" >&2

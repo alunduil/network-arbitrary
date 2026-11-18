@@ -1,5 +1,5 @@
 name: List tested GHC versions
-description: Read the GHC versions in network-arbitrary.cabal's tested-with with get-tested.
+description: List the GHC versions in network-arbitrary.cabal's tested-with field.
 
 inputs:
   ubuntu-version:

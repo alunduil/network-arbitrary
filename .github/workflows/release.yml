@@ -8,8 +8,8 @@ permissions:
   contents: read
 
 jobs:
-  # A job of its own keeps get-tested's downloaded binary out of the job
-  # that holds the Hackage environment.
+  # get-tested runs a downloaded binary, so it stays out of the job that
+  # holds the Hackage environment.
   ghc-version:
     name: Find the newest tested GHC
     runs-on: ubuntu-26.04
