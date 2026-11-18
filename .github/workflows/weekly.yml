@@ -33,18 +33,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: List tested GHC versions
+        id: tested
+        uses: ./.github/actions/tested-ghc
+        with:
+          versions-only: true
+
       # Policy (#112): test every GHC series that upstream hasn't
       # end-of-lifed.
       - name: Detect drift
         id: check
+        env:
+          TESTED: ${{ steps.tested.outputs.matrix }}
         run: |
           set -euo pipefail
 
-          ci_file=.github/workflows/ci.yml
-          cabal_file=network-arbitrary.cabal
-
-          # An empty set means a moved field or an upstream schema
-          # change rather than a real drift, so abort the run.
+          # An empty set means a source changed its format, so abort
+          # instead of reporting drift.
           require_series() {
             if [ -z "$2" ]; then
               echo "no GHC series parsed from $1; aborting" >&2
@@ -57,21 +62,10 @@ jobs:
             | sort -V)
           require_series endoflife.date "$expected"
 
-          matrix=$(yq '.jobs.build.strategy.matrix.ghc[].GHC_VERSION' "$ci_file" \
-            | cut -d. -f1,2 | sort -V)
-          require_series "$ci_file" "$matrix"
-
-          # tested-with spells each series as `>=X.Y && <X.Y+1`, so the
-          # series are its lower bounds. grep exits 1 on no match and
-          # pipefail would abort with no message, so `|| true` leaves the
-          # empty set for require_series to report.
-          tested=$(sed -n '/^tested-with:/,/^$/p' "$cabal_file" \
-            | grep -oE '>=[0-9]+\.[0-9]+' \
-            | grep -oE '[0-9]+\.[0-9]+' | sort -V || true)
-          require_series "$cabal_file" "$tested"
+          tested=$(jq -r '.[]' <<< "$TESTED" | cut -d. -f1,2 | sort -uV)
+          require_series tested-with "$tested"
 
           drift=false
-          [ "$expected" = "$matrix" ] || drift=true
           [ "$expected" = "$tested" ] || drift=true
           echo "drift=$drift" >> "$GITHUB_OUTPUT"
 
@@ -85,17 +79,16 @@ jobs:
           labels:
             - enhancement
           ---
-          The CI matrix and \`tested-with\` should track every GHC series
-          that upstream hasn't end-of-lifed (policy: #112).
+          \`tested-with\` should track every GHC series that upstream
+          hasn't end-of-lifed (policy: #112). CI builds its matrix from it.
 
           | Source | Series |
           | --- | --- |
           | Expected (endoflife.date) | $(join "$expected") |
-          | CI matrix (\`$ci_file\`) | $(join "$matrix") |
-          | \`tested-with\` (\`$cabal_file\`) | $(join "$tested") |
+          | \`tested-with\` (\`network-arbitrary.cabal\`) | $(join "$tested") |
 
-          Update the matrix and \`tested-with\`, then bump per PVP
-          (CI/packaging-only is a patch).
+          Update \`tested-with\`, then bump per PVP (CI/packaging-only is a
+          patch).
           EOF
 
           delimiter=$(openssl rand -hex 16)

@@ -1,0 +1,39 @@
+name: List tested GHC versions
+description: List the GHC versions in network-arbitrary.cabal's tested-with field.
+
+inputs:
+  ubuntu-version:
+    description: Ubuntu runner versions to pair with each GHC, comma separated.
+    default: ""
+  macos-version:
+    description: macOS runner versions to pair with each GHC, comma separated.
+    default: ""
+  newest:
+    description: List only the newest GHC.
+    default: "false"
+  versions-only:
+    description: Output a JSON list of GHC versions instead of a build matrix.
+    default: "false"
+
+outputs:
+  matrix:
+    description: A build matrix, or a JSON list of GHC versions with versions-only.
+    value: ${{ steps.get-tested.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Run get-tested
+      id: get-tested
+      uses: Kleidukos/get-tested@66e7d3233e529aee4a22ff5096288faa26f3fc28
+      # Renovate's regex manager only matches keys ending in _VERSION.
+      env:
+        # renovate: datasource=github-releases depName=Kleidukos/get-tested versioning=loose extractVersion=^v(?<version>.+)$
+        GET_TESTED_VERSION: "0.1.10.0"
+      with:
+        cabal-file: network-arbitrary.cabal
+        version: ${{ env.GET_TESTED_VERSION }}
+        ubuntu-version: ${{ inputs.ubuntu-version }}
+        macos-version: ${{ inputs.macos-version }}
+        newest: ${{ inputs.newest }}
+        versions-only: ${{ inputs.versions-only }}
