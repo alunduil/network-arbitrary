@@ -19,6 +19,12 @@ repos:
       - id: destroyed-symlinks
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.24.1
+    hooks:
+      - id: markdownlint-cli2
+        # Restyling the verbatim Contributor Covenant would fork it.
+        exclude: ^CODE_OF_CONDUCT\.md$
   # Styles are vendored under .vale/styles (see the top-level exclude),
   # so the hook needs no `vale sync` step.
   - repo: https://github.com/errata-ai/vale
@@ -32,7 +38,7 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
-  # `mise install` puts hlint and ormolu on PATH at the versions CI runs.
+  # `mise install` puts hlint, ormolu, and lychee on PATH at the versions CI runs.
   - repo: local
     hooks:
       - id: hlint
@@ -52,3 +58,11 @@ repos:
         language: system
         types_or: ["haskell", "literate-haskell"]
         args: ["-i", "-c"]
+      # Relative links break in the change that renames their target, so they
+      # gate every commit. External links break without a commit, so the
+      # weekly job checks those.
+      - id: lychee
+        name: lychee
+        entry: lychee --config lychee.toml --offline
+        language: system
+        types: [markdown]

@@ -11,7 +11,8 @@ By Alex Brandt <alunduil@gmail.com>
 
 ## Description
 
-You can use network-arbitrary to provide Arbitrary instances for Network module types.
+You can use network-arbitrary to provide Arbitrary instances for Network module
+types.
 
 ## Terms of use
 
@@ -33,7 +34,8 @@ main = generate (arbitrary @URI) >>= print
 ## Documentation
 
 * [Hackage][hackage]: Hackage project page for network-arbitrary
-* [The Design and Use of QuickCheck](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html): An excellent guide to using QuickCheck
+* [The Design and Use of QuickCheck][design-use-quickcheck]: An excellent guide
+  to using QuickCheck
 * [LICENSE](./LICENSE): The license governing use of network-arbitrary
 * [QuickCheck Arbitrary][arbitrary]: QuickCheck's Arbitrary class documentation
 * [Hackage's Network Category][network-category]: Hackage's Network category
@@ -49,6 +51,7 @@ main = generate (arbitrary @URI) >>= print
 * Submit [pull requests] for proposed changes
 
 [arbitrary]: https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html#t:Arbitrary
+[design-use-quickcheck]: https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html
 [hackage]: https://hackage.haskell.org/package/network-arbitrary
 [issues]: https://github.com/alunduil/network-arbitrary/issues
 [network-category]: https://hackage.haskell.org/packages/#cat:Network

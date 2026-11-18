@@ -1,0 +1,13 @@
+no_progress = true
+
+# Takes effect only in the weekly job, the one run that keeps .lycheecache.
+cache = true
+max_cache_age = "1w"
+
+# Retry slow hosts before reporting them dead.
+timeout = 20
+max_retries = 3
+retry_wait_time = 2
+
+# Count a rate-limited 429 as alive.
+accept = ["200..=299", "429"]
