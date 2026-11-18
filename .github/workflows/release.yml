@@ -16,16 +16,12 @@ jobs:
     timeout-minutes: 5
     outputs:
       newest: ${{ fromJSON(steps.newest.outputs.matrix)[0] }}
-    env:
-      # renovate: datasource=github-releases depName=Kleidukos/get-tested versioning=loose extractVersion=^v(?<version>.+)$
-      GET_TESTED_VERSION: "0.1.10.0"
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Find the newest GHC
         id: newest
-        uses: Kleidukos/get-tested@66e7d3233e529aee4a22ff5096288faa26f3fc28
+        uses: ./.github/actions/tested-ghc
         with:
-          cabal-file: network-arbitrary.cabal
-          version: ${{ env.GET_TESTED_VERSION }}
           newest: true
           versions-only: true
 

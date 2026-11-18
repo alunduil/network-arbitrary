@@ -28,17 +28,15 @@ jobs:
     outputs:
       drift: ${{ steps.check.outputs.drift }}
       issue: ${{ steps.check.outputs.issue }}
-    env:
-      # renovate: datasource=github-releases depName=Kleidukos/get-tested versioning=loose extractVersion=^v(?<version>.+)$
-      GET_TESTED_VERSION: "0.1.10.0"
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
       - name: List tested GHC versions
         id: tested
-        uses: Kleidukos/get-tested@66e7d3233e529aee4a22ff5096288faa26f3fc28
+        uses: ./.github/actions/tested-ghc
         with:
-          cabal-file: network-arbitrary.cabal
-          version: ${{ env.GET_TESTED_VERSION }}
           versions-only: true
 
       # Policy (#112): test every GHC series that upstream hasn't
@@ -49,8 +47,6 @@ jobs:
           TESTED: ${{ steps.tested.outputs.matrix }}
         run: |
           set -euo pipefail
-
-          cabal_file=network-arbitrary.cabal
 
           # An empty set means an upstream schema change rather than a
           # real drift, so abort the run.
@@ -67,7 +63,7 @@ jobs:
           require_series endoflife.date "$expected"
 
           tested=$(jq -r '.[]' <<< "$TESTED" | cut -d. -f1,2 | sort -uV)
-          require_series "$cabal_file" "$tested"
+          require_series tested-with "$tested"
 
           drift=false
           [ "$expected" = "$tested" ] || drift=true
@@ -89,7 +85,7 @@ jobs:
           | Source | Series |
           | --- | --- |
           | Expected (endoflife.date) | $(join "$expected") |
-          | \`tested-with\` (\`$cabal_file\`) | $(join "$tested") |
+          | \`tested-with\` (\`network-arbitrary.cabal\`) | $(join "$tested") |
 
           Update \`tested-with\`, then bump per PVP (CI/packaging-only is a
           patch).
