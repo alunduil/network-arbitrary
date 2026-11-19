@@ -75,7 +75,7 @@ jobs:
           # create-an-issue reads the title and labels from front matter.
           cat > ghc-drift-issue.md <<EOF
           ---
-          title: GHC version matrix out of date
+          title: GHC series in tested-with out of date
           labels:
             - enhancement
           ---
@@ -101,7 +101,7 @@ jobs:
   # Filing is its own job so detection, which pull requests run, never holds
   # issues: write.
   file-drift-issue:
-    name: File GHC matrix drift issue
+    name: File GHC series drift issue
     needs: drift
     if: >-
       needs.drift.outputs.drift == 'true'
