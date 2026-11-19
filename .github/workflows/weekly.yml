@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   drift:
-    name: Check GHC matrix drift
+    name: Check GHC series drift
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     outputs:
@@ -75,7 +75,7 @@ jobs:
           # create-an-issue reads the title and labels from front matter.
           cat > ghc-drift-issue.md <<EOF
           ---
-          title: GHC version matrix out of date
+          title: GHC series in tested-with out of date
           labels:
             - enhancement
           ---
@@ -98,10 +98,10 @@ jobs:
             echo "$delimiter"
           } >> "$GITHUB_OUTPUT"
 
-  # Filing is its own job so detection, which pull requests run, never holds
+  # Pull requests run detection but never file, so only this job holds
   # issues: write.
   file-drift-issue:
-    name: File GHC matrix drift issue
+    name: File GHC series drift issue
     needs: drift
     if: >-
       needs.drift.outputs.drift == 'true'
@@ -117,8 +117,8 @@ jobs:
           ISSUE: ${{ needs.drift.outputs.issue }}
         run: printf '%s\n' "$ISSUE" > ghc-drift-issue.md
 
-      # update_existing matches on title, so the drift job's fixed title keeps
-      # every drift run on one issue instead of filing duplicates.
+      # update_existing refreshes the open issue with the same title, so a
+      # fixed title keeps every drift run on one issue.
       - name: File or refresh drift issue
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
