@@ -3,6 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:3.0.13-ubuntu26.04@sha256:b377a08d19467bcc08180cb95098448cac31c1a8423e287ce709a9eb09e14762",
   "features": {
     "ghcr.io/devcontainers-extra/features/mise:1": {},
+    // The Claude Code feature can't install Node on this base image.
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
