@@ -28,33 +28,37 @@ runs:
         CABAL: ${{ inputs.cabal-version }}
       run: |
         ghcup="${GHCUP_INSTALL_BASE_PREFIX:-$HOME}/.ghcup"
-        paths=()
-        # A tool the runner image ships is already on disk, so caching it
-        # only spends cache budget. Restoring over it also fails: the
-        # image's directories are root-owned, so tar exits non-zero and
-        # the restore reports a miss.
-        if [ -d "$ghcup/ghc/$GHC" ]; then
-          ghc_source=image
-        else
-          ghc_source=cache
-          paths+=("$ghcup/ghc/$GHC")
-        fi
-        if [ -d "$ghcup/cabal/$CABAL" ]; then
-          cabal_source=image
-        else
-          cabal_source=cache
-          # ghcup treats cabal-install without its db records as not
-          # installed, then fails to reinstall over the restored files.
-          paths+=("$ghcup/cabal/$CABAL" "$ghcup/db/cabal/$CABAL*")
-        fi
         # Pull requests restore only caches saved on main, and runner
         # image patches roll out unevenly, so the key names the OS
-        # release alone. The sources make an image that stops shipping
-        # a tool miss rather than restore an entry without it.
-        key="ghcup-${ImageOS:?}-$RUNNER_ARCH-ghc-$GHC-$ghc_source-cabal-$CABAL-$cabal_source"
+        # release alone.
+        key="ghcup-${ImageOS:?}-$RUNNER_ARCH"
+        paths=()
+
+        # plan TOOL VERSION PATH...: cache PATHs unless the image ships
+        # TOOL VERSION. A shipped tool is already on disk, and restoring
+        # over its root-owned directories makes tar fail, so the restore
+        # reports a miss. Naming the source in the key makes an image
+        # that stops shipping a tool miss rather than restore an entry
+        # without it.
+        plan() {
+          local tool=$1 version=$2
+          shift 2
+          if [ -d "$ghcup/$tool/$version" ]; then
+            key+="-$tool-$version-image"
+          else
+            key+="-$tool-$version-cache"
+            paths+=("$@")
+          fi
+        }
+
+        plan ghc "$GHC" "$ghcup/ghc/$GHC"
+        # ghcup treats cabal-install without its db records as not
+        # installed, then fails to reinstall over the restored files.
+        plan cabal "$CABAL" "$ghcup/cabal/$CABAL" "$ghcup/db/cabal/$CABAL*"
+
         {
           echo "key=$key"
-          echo "cached=$([ ${#paths[@]} -gt 0 ] && echo true || echo false)"
+          echo "cacheable=$([ ${#paths[@]} -gt 0 ] && echo true || echo false)"
           echo "paths<<EOF"
           printf '%s\n' "${paths[@]}"
           echo "EOF"
@@ -62,7 +66,7 @@ runs:
 
     - name: Restore toolchain
       id: cache
-      if: steps.plan.outputs.cached == 'true'
+      if: steps.plan.outputs.cacheable == 'true'
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.plan.outputs.paths }}
@@ -84,7 +88,7 @@ runs:
         cabal-update: false
 
     - name: Save toolchain
-      if: steps.plan.outputs.cached == 'true' && steps.cache.outputs.cache-hit != 'true'
+      if: steps.plan.outputs.cacheable == 'true' && steps.cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.plan.outputs.paths }}
