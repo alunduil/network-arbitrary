@@ -34,12 +34,13 @@ runs:
         key="ghcup-${ImageOS:?}-$RUNNER_ARCH"
         paths=()
 
-        # plan TOOL VERSION PATH...: cache PATHs unless the image ships
-        # TOOL VERSION. A shipped tool is already on disk, and restoring
-        # over its root-owned directories makes tar fail, so the restore
-        # reports a miss. Naming the source in the key makes an image
-        # that stops shipping a tool miss rather than restore an entry
-        # without it.
+        # Cache only the tools the runner image lacks. The image's copies
+        # are already installed. Their directories are root-owned, so
+        # restoring over them fails and reports a miss.
+        #
+        # The key records where each tool came from. If the image stops
+        # shipping a tool, the key changes and the old entry, which lacks
+        # that tool, is not restored.
         plan() {
           local tool=$1 version=$2
           shift 2
