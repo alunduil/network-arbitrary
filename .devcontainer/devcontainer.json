@@ -2,14 +2,22 @@
   "name": "network-arbitrary",
   "image": "mcr.microsoft.com/devcontainers/base:3.0.14-ubuntu26.04@sha256:e15941f70f26542ef9b0ef4bb64f88b8ecdfe8c3372e730ab6e405792805e742",
   "features": {
-    "ghcr.io/devcontainers-extra/features/mise:1": {}
+    "ghcr.io/devcontainers-extra/features/mise:1": {},
+    // The Claude Code feature can't install Node on this base image.
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ],
   "containerEnv": {
-    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
+    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}",
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
   "remoteUser": "vscode",
   "remoteEnv": {
-    "PATH": "/home/vscode/.ghcup/bin:/home/vscode/.local/share/mise/shims:${containerEnv:PATH}"
+    "PATH": "/home/vscode/.ghcup/bin:/home/vscode/.local/share/mise/shims:${containerEnv:PATH}",
+    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
   },
   "postCreateCommand": ".devcontainer/post-create.sh"
 }

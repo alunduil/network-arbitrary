@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Docker creates the Claude config volume root-owned because the image has no
+# ~/.claude to copy ownership from.
+sudo chown "$(id -u):$(id -g)" "$CLAUDE_CONFIG_DIR"
+
 mise install
 
 # Renovate bumps GHC in tested-with and cabal in ci.yml, so read both there.
