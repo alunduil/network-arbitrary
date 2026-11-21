@@ -28,24 +28,38 @@ runs:
         CABAL: ${{ inputs.cabal-version }}
       run: |
         ghcup="${GHCUP_INSTALL_BASE_PREFIX:-$HOME}/.ghcup"
-        # ghcup treats cabal-install without its db records as not
-        # installed, then fails to reinstall over the restored files.
-        paths=("$ghcup/cabal/$CABAL" "$ghcup/db/cabal/$CABAL*")
-        # A GHC the runner image ships is already on disk, so caching it
-        # only spends cache budget.
-        if [ -d "$ghcup/ghc/$GHC" ]; then
-          ghc_source=image
-        else
-          ghc_source=cache
-          paths+=("$ghcup/ghc/$GHC")
-        fi
         # Pull requests restore only caches saved on main, and runner
         # image patches roll out unevenly, so the key names the OS
-        # release alone. The GHC source makes an image that stops
-        # shipping its GHC miss rather than restore an entry without it.
-        key="ghcup-${ImageOS:?}-$RUNNER_ARCH-ghc-$GHC-$ghc_source-cabal-$CABAL"
+        # release alone.
+        key="ghcup-${ImageOS:?}-$RUNNER_ARCH"
+        paths=()
+
+        # Cache only the tools the runner image lacks. The image's copies
+        # are already installed. Their directories are root-owned, so
+        # restoring over them fails and reports a miss.
+        #
+        # The key records where each tool came from. If the image stops
+        # shipping a tool, the key changes and the old entry, which lacks
+        # that tool, is not restored.
+        plan() {
+          local tool=$1 version=$2
+          shift 2
+          if [ -d "$ghcup/$tool/$version" ]; then
+            key+="-$tool-$version-image"
+          else
+            key+="-$tool-$version-cache"
+            paths+=("$@")
+          fi
+        }
+
+        plan ghc "$GHC" "$ghcup/ghc/$GHC"
+        # ghcup treats cabal-install without its db records as not
+        # installed, then fails to reinstall over the restored files.
+        plan cabal "$CABAL" "$ghcup/cabal/$CABAL" "$ghcup/db/cabal/$CABAL*"
+
         {
           echo "key=$key"
+          echo "cacheable=$([ ${#paths[@]} -gt 0 ] && echo true || echo false)"
           echo "paths<<EOF"
           printf '%s\n' "${paths[@]}"
           echo "EOF"
@@ -53,6 +67,7 @@ runs:
 
     - name: Restore toolchain
       id: cache
+      if: steps.plan.outputs.cacheable == 'true'
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.plan.outputs.paths }}
@@ -70,9 +85,11 @@ runs:
       with:
         ghc-version: ${{ inputs.ghc-version }}
         cabal-version: ${{ inputs.cabal-version }}
+        # Callers update the index in their own step.
+        cabal-update: false
 
     - name: Save toolchain
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: steps.plan.outputs.cacheable == 'true' && steps.cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.plan.outputs.paths }}
