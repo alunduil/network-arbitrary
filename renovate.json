@@ -15,6 +15,18 @@
       "automerge": true
     },
     {
+      "description": "These ship nothing to Hackage consumers, and the pull request's own required checks run the new version. For the devcontainer, that holds only while the required Check CI results job waits on the devcontainer build.",
+      "matchManagers": ["github-actions", "pre-commit", "devcontainer"],
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": true
+    },
+    {
+      "description": "Later rules win, so the shared release-job hold must follow the automerge rules above.",
+      "matchFileNames": [".github/workflows/release.yml", ".github/actions/**"],
+      "matchDatasources": ["!github-runners"],
+      "automerge": false
+    },
+    {
       "description": "Default versioning hides four-component PVP versions. hlint's tags carry a v prefix that mise.toml omits.",
       "matchManagers": ["mise"],
       "matchPackageNames": ["ndmitchell/hlint", "tweag/ormolu"],
