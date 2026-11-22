@@ -15,13 +15,13 @@
       "automerge": true
     },
     {
-      "description": "These ship nothing to Hackage consumers, and the pull request's own required checks run the new action, hook, or devcontainer. Safe for the devcontainer only while Build the devcontainer gates Check CI results.",
+      "description": "These ship nothing to Hackage consumers, and the pull request's own required checks run the new version. For the devcontainer, that holds only while the required Check CI results job waits on the devcontainer build.",
       "matchManagers": ["github-actions", "pre-commit", "devcontainer"],
       "matchUpdateTypes": ["minor", "major"],
       "automerge": true
     },
     {
-      "description": "Repeats the shared release-job hold, which the automerge rules above override because they apply later.",
+      "description": "Later rules win, so the shared release-job hold must follow the automerge rules above.",
       "matchFileNames": [".github/workflows/release.yml", ".github/actions/**"],
       "matchDatasources": ["!github-runners"],
       "automerge": false
