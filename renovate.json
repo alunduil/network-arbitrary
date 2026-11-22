@@ -15,6 +15,18 @@
       "automerge": true
     },
     {
+      "description": "These ship nothing to Hackage consumers, and the pull request's own required checks run the new action, hook, or devcontainer. Safe for the devcontainer only while Build the devcontainer gates Check CI results.",
+      "matchManagers": ["github-actions", "pre-commit", "devcontainer"],
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": true
+    },
+    {
+      "description": "Repeats the shared release-job hold, which the automerge rules above override because they apply later.",
+      "matchFileNames": [".github/workflows/release.yml", ".github/actions/**"],
+      "matchDatasources": ["!github-runners"],
+      "automerge": false
+    },
+    {
       "description": "Default versioning hides four-component PVP versions. hlint's tags carry a v prefix that mise.toml omits.",
       "matchManagers": ["mise"],
       "matchPackageNames": ["ndmitchell/hlint", "tweag/ormolu"],
@@ -31,24 +43,6 @@
       "description": "tasty-quickcheck bounds both tasty and QuickCheck, so bumping one alone can open a PR that fails to resolve.",
       "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
-    },
-    {
-      "description": "These only change CI, and the pull request's own required checks run the new action or hook.",
-      "matchManagers": ["github-actions", "pre-commit"],
-      "matchUpdateTypes": ["minor", "major"],
-      "automerge": true
-    },
-    {
-      "description": "The devcontainer ships nothing to Hackage consumers. Safe only while Build the devcontainer gates Check CI results.",
-      "matchManagers": ["devcontainer"],
-      "matchUpdateTypes": ["minor", "major"],
-      "automerge": true
-    },
-    {
-      "description": "Repeats the shared release-job hold, which the automerge rules above override because they apply later.",
-      "matchFileNames": [".github/workflows/release.yml", ".github/actions/**"],
-      "matchDatasources": ["!github-runners"],
-      "automerge": false
     }
   ]
 }
