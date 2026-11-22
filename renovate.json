@@ -31,6 +31,24 @@
       "description": "tasty-quickcheck bounds both tasty and QuickCheck, so bumping one alone can open a PR that fails to resolve.",
       "matchPackageNames": ["tasty", "tasty-quickcheck", "QuickCheck"],
       "groupName": "haskell test stack"
+    },
+    {
+      "description": "These only change CI, and the pull request's own required checks run the new action or hook.",
+      "matchManagers": ["github-actions", "pre-commit"],
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": true
+    },
+    {
+      "description": "The devcontainer ships nothing to Hackage consumers. Safe only while Build the devcontainer gates Check CI results.",
+      "matchManagers": ["devcontainer"],
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": true
+    },
+    {
+      "description": "Repeats the shared release-job hold, which the automerge rules above override because they apply later.",
+      "matchFileNames": [".github/workflows/release.yml", ".github/actions/**"],
+      "matchDatasources": ["!github-runners"],
+      "automerge": false
     }
   ]
 }
