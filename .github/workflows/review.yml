@@ -1,7 +1,6 @@
 name: Review
 
-# A review starts no pull_request run, so the owner's approval re-runs the
-# failed Renovate commit check in ci.yml.
+# Reviews start no pull_request run.
 on:
   pull_request_review:
     types: [submitted]
