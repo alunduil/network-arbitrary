@@ -290,6 +290,15 @@ jobs:
       - name: Review dependencies
         uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
 
+  # Rulesets require this context by name in every repository, so results
+  # doesn't gate it.
+  check-renovate-commits:
+    name: Check Renovate branch commits
+    uses: alunduil/renovate-config/.github/workflows/check-renovate-commits.yml@6052341d076d02929cd58ba8a5245d4cf13955af # main
+    permissions:
+      contents: read
+      pull-requests: read
+
   # Rulesets require this check by name, so renaming the job breaks the merge
   # gate. It reports every gating job under one name because the build's
   # per-cell check names change with the GHC matrix.
